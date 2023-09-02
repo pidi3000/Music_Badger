@@ -1,0 +1,28 @@
+{% extends 'song_base.html' %}
+
+<!-- Uploads are arranged using display flex  -->
+
+{% block content %}
+<!-- <link type="text/css" rel="stylesheet" href="/style/musicFeed_v2.css"> -->
+
+<h1 data-autoset-text-color="true" class="title">{% block title %} Get Song {% endblock %}</h1>
+
+<form data-autoset-text-color="true" method="post" action="{{ url_for('.get') }}">
+    <p>
+        <label for="yt_id">YouTube ID</label>
+        <input type="text" name="yt_id" placeholder="yt_id">
+        </input>
+    </p>
+    <p>
+        <label for="id">Internal ID</label>
+        <input type="text" name="id" placeholder="Internal ID">
+        </input>
+    </p>
+    
+    <p>
+        <button type="submit">Submit</button>
+    </p>
+</form>
+
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'youtube_base.html' %}
+
+
+{% block content %}
+
+
+
+
+<!-- <h1 data-autoset-text-color="true" class="title">{% block title %} Youtube auth management {% endblock %}</h1> -->
+
+
+<h2 data-autoset-text-color="true">Upload client secret File: </h2>
+<h2 style="color: {% if secret_file_found %} green {% else %} red {% endif%};">File found: {{secret_file_found}}
+</h2>
+<form method=post enctype=multipart/form-data action="{{ url_for('.set_client_secret') }}" data-autoset-text-color="true">
+    <input type=file name=file>
+    <input type=submit value=Upload>
+</form>
+
+
+
+{% endblock %}

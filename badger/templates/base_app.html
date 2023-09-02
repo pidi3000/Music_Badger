@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Music Badger - {% block title %} {% endblock %}</title>
+    <link type="text/css" rel="stylesheet" href="/style/base.css">
+</head>
+
+<body class="body-style">
+    <nav>
+        <a href="{{ url_for('index') }}">FlaskApp</a>
+        <a href="{{ url_for('song.index') }}">Songs</a>
+        <a href="{{ url_for('artist.index') }}">Artists</a>
+        <a href="{{ url_for('youtube_auth.management') }}">YouTube</a>
+        <!-- <a href="{{ url_for('song.list_songs') }}">Get All</a> -->
+    </nav>
+    <hr>
+    {% block navbar %} {% endblock %}
+    <div class="content">
+        {% block content %} {% endblock %}
+    </div>
+</body>
+
+<script src="/scripts/autoset_text_color.js"></script>
+
+</html>

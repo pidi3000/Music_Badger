@@ -1,0 +1,9 @@
+{% extends 'base_app.html' %}
+    
+{% block navbar %}
+    <nav>
+        <a href="{{ url_for('.list') }}">All</a>
+        <a href="{{ url_for('.get') }}">Get</a>
+    </nav>
+    <hr>
+{% endblock %}

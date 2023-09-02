@@ -1,0 +1,96 @@
+{% extends 'song_base.html' %}
+
+<!-- Uploads are arranged using display flex  -->
+
+{% block content %}
+<!-- <link type="text/css" rel="stylesheet" href="/style/musicFeed_v2.css"> -->
+
+<h1 data-autoset-text-color="true" class="title">{% block title %} Add Song {% endblock %}</h1>
+<button onclick="get_song_info()">
+    Get song info
+</button>
+
+<form data-autoset-text-color="true" method="post" action="{{ url_for('.add') }}">
+    <p>
+        <label for="yt_id">Youtube ID</label>
+        <input id="yt_id" type="text" name="yt_id" placeholder="yt_id">
+        </input>
+    </p>
+    <p>
+        <label for="artist">Artist Name</label>
+        <input id="artist_names" type="text" name="artists" placeholder="artist name">
+        </input>
+    </p>
+    <p>
+        <label for="song_title">song_title</label>
+        <input id="song_title" type="text" name="song_title" placeholder="song_title">
+        </input>
+    </p>
+    <p>
+        <label for="song_extras">extras</label>
+        <input id="song_extras" type="text" name="song_extras" placeholder="extras">
+        </input>
+    </p>
+
+    <p>
+        <button type="submit">Submit</button>
+    </p>
+</form>
+
+<script>
+    const get_song_API_url = "{{ url_for('.get_info') }}";
+    function get_song_info() {
+
+        var formData = new FormData();
+        var yt_id = document.getElementById("yt_id").value;
+        console.log("yt_id, " + yt_id)
+        formData.append("yt_id", yt_id);
+
+        // var channel_data = load_json();
+        // console.log(channel_data);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", get_song_API_url);
+        xhr.onload = function (event) {
+            // console.log(xhr);
+            console.log(xhr.status);
+
+            if (xhr.status == 200) {
+                var song_data_raw = event.target.response;
+                // console.log(channel_data_raw);
+
+                var song_data = JSON.parse(song_data_raw);
+                console.log(song_data);
+
+                var artist_names_input = document.getElementById("artist_names")
+                artist_names_input.value = "";
+
+                // console.log(artist);
+                for (let index = 0; index < song_data["artists"].length; index++) {
+                    const artist = song_data["artists"][index];
+                    console.log(artist);
+
+                    artist_names_input.value += artist["name"];
+                    if (index + 1 < song_data["artists"].length) {
+                        artist_names_input.value += ", ";
+                    }
+                }
+
+                document.getElementById("song_title").value = song_data["name"];
+                document.getElementById("song_extras").value = song_data["extras"];
+
+            } else {
+                alert("ERROR, response status: " + xhr.status)
+            }
+
+
+
+        };
+        // or onerror, onabort
+        xhr.send(formData);
+
+
+    }
+</script>
+
+{% endblock %}

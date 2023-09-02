@@ -1,0 +1,10 @@
+{% extends 'base_app.html' %}
+
+{% block navbar %}
+<nav>
+    <a href="{{ url_for('.authorize') }}">YouTube authorize</a>
+    <a href="{{ url_for('.revoke') }}">YouTube revoke</a>
+    <a href="{{ url_for('.clear_credentials') }}">Cler session</a>
+</nav>
+<hr>
+{% endblock %}

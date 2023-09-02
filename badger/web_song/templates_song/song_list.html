@@ -1,0 +1,93 @@
+{% extends 'song_base.html' %}
+
+<!-- Uploads are arranged using display flex  -->
+
+{% block content %}
+<!-- <link type="text/css" rel="stylesheet" href="/style/musicFeed_v2.css"> -->
+
+<h1 data-autoset-text-color="true" class="title">{% block title %} All Song {% endblock %}</h1>
+
+<style>
+    .grid-container {
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+        background-color: #707070;
+        padding: 10px;
+    }
+
+    .grid-item {
+        background-color: rgba(0, 0, 0, 0.8);
+        border: 3px solid rgb(255, 0, 0);
+
+        max-width: 250;
+        
+        padding: 3px;
+        margin: 10px;
+        
+        font-size: 20px;
+        /* text-align: center; */
+    }
+</style>
+
+<div style="width: 99%;">
+<ul data-autoset-text-color="true" class="grid-container">
+
+    {% for song in songs %}
+
+    <div class="grid-item">
+        <p>
+            {{ song.user_data.id }}
+        </p>
+
+        <p>
+            {% for artist in song.user_data.artist_list %} {{ artist.name }}, {% endfor %}
+        </p>
+
+        <p>
+            {{ song.user_data.name }}
+        </p>
+
+        <p>
+            {{ song.user_data.extras }}
+        </p>
+
+        <p>
+            {{ song.meta_data.yt_id }}
+        </p>
+
+        <p>
+            {{ song.meta_data.date_added }}
+        </p>
+        
+
+        
+        <!-- <p>
+            ID: {{ song.user_data.id }}
+        </p>
+
+        <p>
+            {% for artist in song.user_data.artist_list %} {{ artist.name }}, {% endfor %}
+        </p>
+
+        <p>
+            Name: {{ song.user_data.name }}
+        </p>
+
+        <p>
+            Extra: {{ song.user_data.extras }}
+        </p>
+
+        <p>
+            YT ID: {{ song.meta_data.yt_id }}
+        </p>
+
+        <p>
+            Date: {{ song.meta_data.date_added }}
+        </p> -->
+
+    </div>
+
+    {% endfor %}
+</ul>
+</div>
+{% endblock %}

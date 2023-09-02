@@ -1,0 +1,55 @@
+{% extends 'artist_base.html' %}
+
+<!-- Uploads are arranged using display flex  -->
+
+{% block content %}
+<!-- <link type="text/css" rel="stylesheet" href="/style/musicFeed_v2.css"> -->
+
+<h1 data-autoset-text-color="true" class="title">{% block title %} List Artist {% endblock %}</h1>
+
+<style>
+    .grid-container {
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+        background-color: #707070;
+        padding: 10px;
+    }
+
+    .grid-item {
+        background-color: rgba(0, 0, 0, 0.8);
+        border: 3px solid rgb(255, 0, 0);
+
+        max-width: 250;
+        
+        padding: 3px;
+        margin: 10px;
+        
+        font-size: 20px;
+        /* text-align: center; */
+    }
+</style>
+
+<div style="width: 99%;">
+<ul data-autoset-text-color="true" class="grid-container">
+
+    {% for artist in artists %}
+
+    <div class="grid-item">
+        <p>
+            ID: {{ artist.id }}
+        </p>
+
+        <p>
+            Name: {{ artist.name }}
+        </p>
+
+        <p>
+            Num: {{ artist.num_songs }}
+        </p>
+
+    </div>
+
+    {% endfor %}
+</ul>
+</div>
+{% endblock %}
