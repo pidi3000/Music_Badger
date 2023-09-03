@@ -8,7 +8,9 @@ import json
 
 from . import blueprint as ingest_pages
 from ..data_handler.song_handler import Artist
-from ..help_functions import exception_to_dict, get_as_type_or_none
+from ..data_handler.user_input_handler import User_Input_Handler
+
+from ..help_functions import exception_to_dict
 
 import random
 from pprint import pprint
@@ -22,7 +24,7 @@ def index():
 @ingest_pages.route('/get', methods=["GET", "POST"])
 def get():
     if request.method == 'POST':
-        id = get_as_type_or_none(request.values.get("id"), int)
+        id = User_Input_Handler.get_as_type_or_none(request.values.get("id"), int)
 
         try:
             artist = Artist.get_by_ID(id=id)

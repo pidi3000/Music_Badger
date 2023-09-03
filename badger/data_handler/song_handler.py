@@ -29,7 +29,13 @@ class Song(MyJsonConvertable):
                ):
         # https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
 
-        # data is auto comitted to DB
+        # data is auto committed to DB
+        # this can lead to stray data in DB if errors occure
+        # primarly Song_Meta_Data, Publisher and maybe Artist
+        # two possible solutions:
+        # 1. only commit on succes, revert/rollback DB on error https://docs.sqlalchemy.org/en/20/orm/session_transaction.html
+        # 2. run garbage collection of unused entry
+
         """
         Adds a new song to the collection
 

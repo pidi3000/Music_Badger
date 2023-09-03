@@ -8,7 +8,9 @@ import json
 
 from . import blueprint as song_pages
 from ..data_handler.song_handler import Song, Artist
-from ..help_functions import exception_to_dict, get_as_type_or_none, extract_yt_ID
+from ..data_handler.user_input_handler import User_Input_Handler
+
+from ..help_functions import exception_to_dict
 
 import random
 from pprint import pprint
@@ -22,11 +24,13 @@ def index():
 # Handle GET song
 ####################################################################################################
 
+
 @song_pages.route('/get_song', methods=["GET", "POST"])
 def get():
     if request.method == 'POST':
-        id = get_as_type_or_none(request.values.get("id"), int)
-        yt_id = extract_yt_ID(get_as_type_or_none(
+        id = User_Input_Handler.get_as_type_or_none(
+            request.values.get("id"), int)
+        yt_id = User_Input_Handler.extract_yt_ID(User_Input_Handler.get_as_type_or_none(
             request.values.get("yt_id"), str))
 
         try:
@@ -46,7 +50,7 @@ def get():
 @song_pages.route('/get_song_info', methods=["GET", "POST"])
 def get_info():
     if request.method == 'POST':
-        yt_id = extract_yt_ID(get_as_type_or_none(
+        yt_id = User_Input_Handler.extract_yt_ID(User_Input_Handler.get_as_type_or_none(
             request.values.get("yt_id"), str))
 
         try:
@@ -98,10 +102,10 @@ def add():
         # print()
         # print()
 
-        # yt_id = get_as_type_or_none(request.values.get("yt_id"), str)
-        # artist_data = get_as_type_or_none(request.values.getlist("artists"), str)
-        # song_title = get_as_type_or_none(request.values.get("song_title"), str)
-        # song_extras = get_as_type_or_none(request.values.get("song_extras"), str)
+        # yt_id = User_Input_Handler.get_as_type_or_none(request.values.get("yt_id"), str)
+        # artist_data = User_Input_Handler.get_as_type_or_none(request.values.getlist("artists"), str)
+        # song_title = User_Input_Handler.get_as_type_or_none(request.values.get("song_title"), str)
+        # song_extras = User_Input_Handler.get_as_type_or_none(request.values.get("song_extras"), str)
 
         yt_id = request.values.get("yt_id")
         artist_data = request.values.getlist("artists")
@@ -124,10 +128,11 @@ def add():
 def handle_add_song(yt_id: str, artist_data: int | str | list[str], song_title: str | None, song_extras: str | list[str] | None):
     response = None
     try:
-        yt_id = extract_yt_ID(get_as_type_or_none(yt_id, str))
-        artist_data = get_as_type_or_none(artist_data, str)
-        song_title = get_as_type_or_none(song_title, str)
-        song_extras = get_as_type_or_none(song_extras, str)
+        yt_id = User_Input_Handler.extract_yt_ID(
+            User_Input_Handler.get_as_type_or_none(yt_id, str))
+        artist_data = User_Input_Handler.get_as_type_or_none(artist_data, str)
+        song_title = User_Input_Handler.get_as_type_or_none(song_title, str)
+        song_extras = User_Input_Handler.get_as_type_or_none(song_extras, str)
 
         print("Debug Artist: ", artist_data)
         new_song = Song.create(yt_id, artist_data, song_title, song_extras)
@@ -154,10 +159,10 @@ def add_song_list(song_data_list: dict, include_succes_msg: bool = False):
             song_title = song.get("song_title")
             song_extras = song.get("song_extras")
 
-            # yt_id = get_as_type_or_none(song["yt_id"], str)
-            # artist_data = get_as_type_or_none(song["artists"], str)
-            # song_title = get_as_type_or_none(song["song_title"], str)
-            # song_extras = get_as_type_or_none(song["song_extras"], str)
+            # yt_id = User_Input_Handler.get_as_type_or_none(song["yt_id"], str)
+            # artist_data = User_Input_Handler.get_as_type_or_none(song["artists"], str)
+            # song_title = User_Input_Handler.get_as_type_or_none(song["song_title"], str)
+            # song_extras = User_Input_Handler.get_as_type_or_none(song["song_extras"], str)
 
             response = handle_add_song(
                 yt_id, artist_data, song_title, song_extras)
@@ -183,10 +188,10 @@ def edit():
 
         print()
 
-        # yt_id = get_as_type_or_none(request.values.get("yt_id"), str)
-        # artist_data = get_as_type_or_none(request.values.getlist("artists"), str)
-        # song_title = get_as_type_or_none(request.values.get("song_title"), str)
-        # song_extras = get_as_type_or_none(request.values.get("song_extras"), str)
+        # yt_id = User_Input_Handler.get_as_type_or_none(request.values.get("yt_id"), str)
+        # artist_data = User_Input_Handler.get_as_type_or_none(request.values.getlist("artists"), str)
+        # song_title = User_Input_Handler.get_as_type_or_none(request.values.get("song_title"), str)
+        # song_extras = User_Input_Handler.get_as_type_or_none(request.values.get("song_extras"), str)
 
         yt_id = request.values.get("yt_id")
         artist_data = request.values.getlist("artists")
@@ -208,10 +213,11 @@ def handle_edit_song(yt_id: str, artist_data: int | str | list[str], song_title:
 
     response = None
     try:
-        yt_id = extract_yt_ID(get_as_type_or_none(yt_id, str))
-        artist_data = get_as_type_or_none(artist_data, str)
-        song_title = get_as_type_or_none(song_title, str)
-        song_extras = get_as_type_or_none(song_extras, str)
+        yt_id = User_Input_Handler.extract_yt_ID(
+            User_Input_Handler.get_as_type_or_none(yt_id, str))
+        artist_data = User_Input_Handler.get_as_type_or_none(artist_data, str)
+        song_title = User_Input_Handler.get_as_type_or_none(song_title, str)
+        song_extras = User_Input_Handler.get_as_type_or_none(song_extras, str)
 
         print("Debug EDIT Artist: ", artist_data)
         new_song = Song.edit(yt_id, artist_data, song_title, song_extras)
@@ -225,4 +231,3 @@ def handle_edit_song(yt_id: str, artist_data: int | str | list[str], song_title:
     # response = (exception_to_dict(NotImplementedError("Not yet implemented")))
 
     return response
-
