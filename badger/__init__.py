@@ -6,17 +6,16 @@ import os
 
 from flask import Flask, render_template, Response, url_for, redirect
 
-from ._data.config import Config
 from .extension import db
 
 
 def _register_all_blueprints(app: Flask):
     from . import web_song as routes
     routes.init(app)
-    
+
     from . import web_artist as routes
     routes.init(app)
-    
+
     from . import web_youtube as routes
     routes.init(app)
 
@@ -72,16 +71,26 @@ def _init_db(app: Flask):
         db.create_all()
 
 
-def init_with_app(app:Flask):
-    print(Config.SQLALCHEMY_DATABASE_URI)
+def init_with_app(app: Flask):
+    # print(Config.SQLALCHEMY_DATABASE_URI)
     _init_db(app)
     _register_all_blueprints(app)
     _register_base_routes(app)
 
 
-def create_app(config_class=Config):
+def create_app(config) -> Flask:
+    """
+    Create app using settings defined in instace
+
+    Parameters
+    ----------
+
+    config
+        instace with FLASK settings as variabels
+    """
+
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    app.config.from_object(config)
 
     init_with_app(app)
 

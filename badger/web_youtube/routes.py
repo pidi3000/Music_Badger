@@ -9,18 +9,8 @@ import requests
 from . import blueprint as youtube_auth_pages
 
 import os
-from flask import flash, request, redirect, url_for, render_template
+from flask import flash, request, redirect, url_for, render_template, current_app
 from werkzeug.utils import secure_filename
-
-
-# TODO move to config file
-
-# This variable specifies the name of a file that contains the OAuth 2.0
-# information for this application, including its client_id and client_secret.
-CLIENT_SECRETS_FILE = os.path.join(
-    os.path.dirname(__file__), "client_secret_youtube.json")
-# CLIENT_SECRETS_FILE = "client_secret_youtube.json"
-# CLIENT_SECRETS_FILE = "../_data/private/client_secret_youtube.json"
 
 
 # This OAuth 2.0 access scope allows for full read/write access to the
@@ -28,6 +18,10 @@ CLIENT_SECRETS_FILE = os.path.join(
 SCOPES = ['https://www.googleapis.com/auth/youtube.readonly']
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
+
+
+def get_client_secrets_file_path() -> str:
+    return current_app.config["MUSIC_BADGER"]["CLIENT_SECRETS_FILE"]
 
 
 def check_yt_authenticated():  # TODO start using this everywhere I need to check
@@ -61,7 +55,7 @@ def get_authorized_yt_obj():
 
 
 def check_secret_file_exists():
-    return os.path.isfile(CLIENT_SECRETS_FILE)
+    return os.path.isfile(get_client_secrets_file_path())
 
 ################################################################################################################################
 
@@ -80,7 +74,7 @@ def authorize():
 
     # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, scopes=SCOPES)
+        get_client_secrets_file_path(), scopes=SCOPES)
 
     # The URI created here must exactly match one of the authorized redirect URIs
     # for the OAuth 2.0 client, which you configured in the API Console. If this
@@ -108,7 +102,7 @@ def oauth2callback():
     state = flask.session['state']
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
+        get_client_secrets_file_path(), scopes=SCOPES, state=state)
     flow.redirect_uri = flask.url_for('.oauth2callback', _external=True)
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
@@ -188,7 +182,7 @@ def set_client_secret():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             # file.save(os.path.join(UPLOAD_FOLDER, filename))
-            file.save(CLIENT_SECRETS_FILE)
+            file.save(get_client_secrets_file_path())
 
             return redirect(url_for('.management'))
 

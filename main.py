@@ -6,27 +6,27 @@ APP_VERSION = "0.0.5"
 # TODO ?will I use user_id / multi user song data?                  - No for now
 
 
-# TODO DONE add artist pages
-# TODO DONE get song meta data from youtube
 # TODO add Publisher pages
-
 # TODO export test song entrys from my music playlist for unittest
+
 
 if __name__ == '__main__':
     import badger
 
+    from data.config import Config
+    config = Config()
+
     # app.secret_key = 'REPLACE ME - this value is here as a placeholder.'
-    app = badger.create_app()
+    app = badger.create_app(config=config)
 
     print(app.url_map)
-
-    from badger._data.config import db_path
 
     print("-"*100)
     print(".\n"*2)
     print("Version: ", APP_VERSION)
     print("")
-    print("DB_path: ", db_path)
+    print("MUSIC_BADGER: ", app.config["MUSIC_BADGER"])
+    print("DB_path: ", app.config["SQLALCHEMY_DATABASE_URI"])
     print(".\n"*2)
     print("-"*100)
 
