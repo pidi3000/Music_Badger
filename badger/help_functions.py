@@ -1,7 +1,5 @@
 # from __future__ import annotations
 
-from re import match
-from datetime import datetime
 import json
 
 from .extension import MyJsonEncoder
@@ -14,3 +12,7 @@ def exception_to_dict(exception: Exception):
             "type": str(exception.__class__.__name__),
             "msg": str(exception)}
     }
+
+def obj_list_to_json(list) -> dict:
+    """Turn a list of custom classes into json serializable dict"""
+    return json.loads(json.dumps(list, cls=MyJsonEncoder))

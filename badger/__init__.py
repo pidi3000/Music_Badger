@@ -6,10 +6,12 @@ import os
 
 from flask import Flask, render_template, Response, url_for, redirect
 
-from .extension import db
-
 
 def _register_all_blueprints(app: Flask):
+
+    from . import api as routes
+    routes.init(app)
+
     from . import web_song as routes
     routes.init(app)
 
@@ -60,10 +62,13 @@ def _register_base_routes(app: Flask):
     def test_page():
         # from badger.data_handler.youtube_data_handler import get_video_data_raw
         # return get_video_data_raw("LP_qEm1BKiw")
+
         return '<h1>Testing the Flask Application Factory Pattern</h1>'
 
 
 def _init_db(app: Flask):
+    from .extension import db
+
     db.init_app(app)
 
     from . import db_models
