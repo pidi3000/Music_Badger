@@ -1,5 +1,5 @@
 
-APP_VERSION = "0.0.5"
+APP_VERSION = "0.1.0"
 
 
 # TODO ?do I need to check before create on each table element?     - don't think so, check are done before song is added at all. So there shouldn't be duplicates

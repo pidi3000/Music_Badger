@@ -2,7 +2,7 @@ from ..db_models import Artist
 
 
 class User_Input_Handler:
-    # TODO do proper sanetizing to avoid SQL injection and stuff like that
+    # TODO do proper sanitizing to avoid SQL injection and stuff like that
     """
     Clean and sanitize user input
     """
