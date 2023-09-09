@@ -55,11 +55,6 @@ class YouTube_Auth_Handler:
     ##################################################
 
     @classmethod
-    def get_credentials(cls):
-        # can raise KeyError, must firts run check_yt_authorized to verify
-        return flask.session[cls.SESSION_NAME_CREDENTIALS]
-
-    @classmethod
     def get_access_token(cls) -> AccessToken:
         # can raise KeyError, must firts run check_yt_authorized to verify
         return AccessToken.from_json(flask.session[cls.SESSION_NAME_ACCESSTOKEN])
@@ -77,9 +72,10 @@ class YouTube_Auth_Handler:
         """
         Check if the users YT account has authorized the service
         """
-        authorized = cls.SESSION_NAME_CREDENTIALS in flask.session and cls.check_secret_file_exists()
+        authorized = cls.SESSION_NAME_ACCESSTOKEN in flask.session and cls.check_secret_file_exists()
         return authorized
 
+    @classmethod
     def get_authorized_client(cls) -> pyyoutube.Client:
         if not cls.check_yt_authorized():
             raise PermissionError("User must authorize service")
