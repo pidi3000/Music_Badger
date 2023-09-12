@@ -1,6 +1,7 @@
 
 
 from flask import request, jsonify
+import traceback
 
 from . import blueprint as api_pages
 
@@ -11,42 +12,38 @@ from ....help_functions import exception_to_dict, obj_list_to_json
 
 
 ####################################################################################################
-# Handle GET song
+# Handle song
 ####################################################################################################
 
+@api_pages.route('/song', methods=["GET", "POST", "PUT"])
+def index():
+    response = None
 
-@api_pages.route('/get', methods=["POST", "GET"])
-def get():
-    if True:  # request.method == 'POST':
-        id = User_Input_Handler.get_as_type_or_none(
-            request.values.get("id"), int)
-        yt_id = User_Input_Handler.get_as_type_or_none(
-            request.values.get("yt_id"), str)
+    if request.method == 'GET':
+        # response = handle_get_song_path()
+        response = _handle_get_song()
 
-        # TODO make this better, maybe auto detect if yt_id is link or acutally and ID
-        if yt_id is None:
-            yt_id = User_Input_Handler.extract_yt_ID(User_Input_Handler.get_as_type_or_none(
-                request.values.get("yt_link"), str))
+    if request.method == 'POST':
+        # response = handle_add_song_path()
+        song_data = _get_song_data()
+        response = _handle_add_song(song_data)
 
-        try:
-            new_song = Song.get(id=id, yt_id=yt_id)
-            response = new_song.to_json()
-        except (TypeError, LookupError) as e:
-            response = exception_to_dict(e)
+    if request.method == 'PUT':
+        # response = handle_edit_song_path()
+        song_data = _get_song_data()
+        response = _handle_edit_song(song_data)
 
-        # new_song = Artist.get_by_ID(2)
-        # response = (exception_to_dict(e))
-
-        return jsonify(response)
+    return response
+    # return jsonify(response)
 
 
-@api_pages.route('/info', methods=["POST", "GET"])
+@api_pages.route('/song/info', methods=["GET"])
 def get_info():
-    if True:  # request.method == 'POST':
-        yt_id = User_Input_Handler.extract_yt_ID(User_Input_Handler.get_as_type_or_none(
-            request.values.get("yt_id"), str))
-        
+    if request.method == 'GET':
+        yt_id = User_Input_Handler.extract_yt_ID(request.values.get("yt_id"))
+
         print("yt_id: ", yt_id)
+        # return str(yt_id), 200
 
         try:
             song_info = Song.get_info(yt_id=yt_id)
@@ -60,78 +57,55 @@ def get_info():
     # return jsonify(exception_to_dict(NotImplementedError("")))
 
 
-@api_pages.route('/list', methods=["POST", "GET"])
-def list_songs():
-    all_songs = Song.get_all()
+####################################################################################################
+# Handle GET song
+####################################################################################################
+def _handle_get_song():
+    def _print_debug(var_name):
+        return
+        print("DEBUG GET: ", var_name, "\t",request.values.get(var_name), "\t", type(request.values.get(var_name)))
 
-    # return all_songs
-    return obj_list_to_json(all_songs)
-    # return render_template("song_list.html", songs=all_songs)
+    _print_debug("all")
+    _print_debug("id")
+    _print_debug("yt_id")
+
+    all = User_Input_Handler.get_as_type_or_none(
+        request.values.get("all"), bool)
+
+    if all:
+        all_songs = Song.get_all()
+        return obj_list_to_json(all_songs)  # TODO use API response handler
+
+    id = User_Input_Handler.get_as_type_or_none(request.values.get("id"), int)
+    yt_id = User_Input_Handler.extract_yt_ID(request.values.get("yt_id")) if id is None else None
+
+    try:
+        new_song = Song.get(id=id, yt_id=yt_id)
+        response = new_song.to_json()
+    except (TypeError, LookupError) as e:
+        response = exception_to_dict(e)
+        traceback.print_exc()
+
+    # new_song = Artist.get_by_ID(2)
+    # response = (exception_to_dict(e))
+
+    return response
 
 
 ####################################################################################################
 # Handle ADD song
 ####################################################################################################
-@api_pages.route('/add', methods=["POST",])
-def add():
-    if request.method == 'POST':
-
-        print()
-
-        if request.is_json:
-            song_data_list: dict = request.get_json()
-            # print(song_data_list)
-            # print(request.json)
-            print(len(request.json))
-            # print()
-            # print()
-            # pprint(request.json)
-            # print()
-            # print()
-
-            response = add_song_list(song_data_list)
-            print("Response 1:\n", response, "\n")
-            return jsonify(response)
-
-        # return jsonify(False)
-        # print()
-        # print()
-        # pprint(request.values)
-        # print()
-        # print()
-
-        # yt_id = User_Input_Handler.get_as_type_or_none(request.values.get("yt_id"), str)
-        # artist_data = User_Input_Handler.get_as_type_or_none(request.values.getlist("artists"), str)
-        # song_title = User_Input_Handler.get_as_type_or_none(request.values.get("song_title"), str)
-        # song_extras = User_Input_Handler.get_as_type_or_none(request.values.get("song_extras"), str)
-
-        yt_id = request.values.get("yt_id")
-        artist_data = request.values.getlist("artists")
-        song_title = request.values.get("song_title")
-        song_extras = request.values.get("song_extras")
-
-        print("Debug Artist: ", artist_data)
-
-        response = handle_add_song(yt_id, artist_data, song_title, song_extras)
-        print("Response 2:\n", response, "\n")
-        return jsonify(response)
-
-
-    # return render_template("song_ingest.html")
-    # return jsonify("Response 3:\n", False, "\n")
-
-
-def handle_add_song(yt_id: str, artist_data: int | str | list[str], song_title: str | None, song_extras: str | list[str] | None):
+def _handle_add_song(song_data: dict):
     response = None
     try:
-        yt_id = User_Input_Handler.extract_yt_ID(
-            User_Input_Handler.get_as_type_or_none(yt_id, str))
-        artist_data = User_Input_Handler.get_as_type_or_none(artist_data, str)
-        song_title = User_Input_Handler.get_as_type_or_none(song_title, str)
-        song_extras = User_Input_Handler.get_as_type_or_none(song_extras, str)
+        print("Debug ADD: ", song_data)
+        new_song = Song.create(
+            yt_id=song_data["yt_id"],
+            artist_data=song_data["artists"],
+            song_title=song_data["title"],
+            song_extras=song_data["extras"]
+        )
 
-        print("Debug Artist: ", artist_data)
-        new_song = Song.create(yt_id, artist_data, song_title, song_extras)
         response = new_song.to_json()
 
     except (ValueError, LookupError) as e:
@@ -140,81 +114,22 @@ def handle_add_song(yt_id: str, artist_data: int | str | list[str], song_title: 
         response = (exception_to_dict(e))
 
     return response
-
-
-def add_song_list(song_data_list: dict, include_succes_msg: bool = False):
-    responses = {}
-
-    if "songs" in song_data_list:
-        for song in song_data_list["songs"]:
-            song: dict
-            # print(song)
-
-            yt_id = song.get("yt_id")
-            artist_data = song.get("artists")
-            song_title = song.get("song_title")
-            song_extras = song.get("song_extras")
-
-            # yt_id = User_Input_Handler.get_as_type_or_none(song["yt_id"], str)
-            # artist_data = User_Input_Handler.get_as_type_or_none(song["artists"], str)
-            # song_title = User_Input_Handler.get_as_type_or_none(song["song_title"], str)
-            # song_extras = User_Input_Handler.get_as_type_or_none(song["song_extras"], str)
-
-            response = handle_add_song(
-                yt_id, artist_data, song_title, song_extras)
-
-            if isinstance(response, dict):
-                responses[yt_id] = response
-
-            elif response is True and include_succes_msg:
-                responses[yt_id] = response
-
-    else:
-        responses = exception_to_dict(ValueError(" No key 'songs' in data"))
-
-    return responses
 
 
 ####################################################################################################
 # Handle EDIT song
 ####################################################################################################
-@api_pages.route('/edit', methods=["POST",])
-def edit():
-    if request.method == 'POST':
-
-        print()
-
-        # yt_id = User_Input_Handler.get_as_type_or_none(request.values.get("yt_id"), str)
-        # artist_data = User_Input_Handler.get_as_type_or_none(request.values.getlist("artists"), str)
-        # song_title = User_Input_Handler.get_as_type_or_none(request.values.get("song_title"), str)
-        # song_extras = User_Input_Handler.get_as_type_or_none(request.values.get("song_extras"), str)
-
-        yt_id = request.values.get("yt_id")
-        artist_data = request.values.getlist("artists")
-        song_title = request.values.get("song_title")
-        song_extras = request.values.get("song_extras")
-
-        response = handle_edit_song(
-            yt_id, artist_data, song_title, song_extras)
-        print("Response 2:\n", response, "\n")
-        return jsonify(response)
-
-
-    # return render_template("song_edit.html")
-
-
-def handle_edit_song(yt_id: str, artist_data: int | str | list[str], song_title: str | None, song_extras: str | list[str] | None):
-
+def _handle_edit_song(song_data: dict):
     response = None
     try:
-        yt_id = User_Input_Handler.extract_yt_ID(
-            User_Input_Handler.get_as_type_or_none(yt_id, str))
-        artist_data = User_Input_Handler.get_as_type_or_none(artist_data, str)
-        song_title = User_Input_Handler.get_as_type_or_none(song_title, str)
-        song_extras = User_Input_Handler.get_as_type_or_none(song_extras, str)
+        print("Debug EDIT: ", song_data)
+        new_song = Song.edit(
+            yt_id=song_data["yt_id"],
+            artist_data=song_data["artists"],
+            song_title=song_data["title"],
+            song_extras=song_data["extras"]
+        )
 
-        print("Debug EDIT Artist: ", artist_data)
-        new_song = Song.edit(yt_id, artist_data, song_title, song_extras)
         response = new_song.to_json()
 
     except (ValueError, LookupError) as e:
@@ -222,6 +137,62 @@ def handle_edit_song(yt_id: str, artist_data: int | str | list[str], song_title:
         # print(e)
         response = (exception_to_dict(e))
 
-    # response = (exception_to_dict(NotImplementedError("Not yet implemented")))
-
     return response
+
+
+####################################################################################################
+# Get song data from request
+####################################################################################################
+def _get_song_data():
+    """
+    Get song data from request body (json)
+
+    Returns
+    -------
+    dict
+        dict containg all provided keys, but only the yt_id key is requiered\n
+        ```
+        {
+            "yt_id": "string",
+            "artists": [
+                "string",
+            ],
+            "title": "string",
+            "extras": "string",
+        }
+        ```
+    """
+    if request.is_json:
+        song_data: dict = request.get_json()
+        print()
+        print("DEBUG: song data")
+        print(song_data)
+        print()
+        # print(request.json)
+        # print()
+        # print(len(request.json))
+        # print()
+
+        if "yt_id" not in song_data:
+            raise KeyError("The key yt_id must be set")
+
+        yt_id = song_data["yt_id"]
+        artist_data = song_data.get("artists")
+        song_title = song_data.get("title")
+        song_extras = song_data.get("extras")
+
+        yt_id = User_Input_Handler.extract_yt_ID(yt_id)
+        artist_data = User_Input_Handler.get_as_type_or_none(artist_data, str)
+        song_title = User_Input_Handler.get_as_type_or_none(song_title, str)
+        song_extras = User_Input_Handler.get_as_type_or_none(song_extras, str)
+
+        data = {
+            "yt_id": yt_id,
+            "artists": artist_data,
+            "title": song_title,
+            "extras": song_extras,
+        }
+
+        return data
+
+    raise TypeError("Request body must be in json format")
