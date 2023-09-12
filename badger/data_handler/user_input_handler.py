@@ -1,3 +1,6 @@
+
+import re
+
 from ..db_models import Artist
 
 
@@ -6,6 +9,58 @@ class User_Input_Handler:
     """
     Clean and sanitize user input
     """
+
+    @classmethod
+    def extract_yt_ID(cls, yt_link: str) -> str | None:
+        """
+        Extract YouTube video ID from a YouTube link
+
+        Parameters
+        ----------
+        yt_link : str
+            YouTube link in one of the following formats:\n
+            1 youtu.be/`yt_id`\n
+            2 youtube.com/watch?v=`yt_id`[&index=10] (can have more URL parameters but 'v=' MUST containe the video ID)\n
+            or the YouTube video ID itself
+                is regex matched using `^[a-zA-Z0-9_-]*$`
+
+        Returns
+        -------
+        `str`
+            the extraxted YouTube video ID
+
+        `None`
+            if yt_link is `None`
+
+        Raises
+        ------
+        ValueError
+            if no supported format is found for `yt_link`
+
+        """
+
+        if yt_link is None:
+            return None
+
+        if "youtu.be" in yt_link:  # link looks like "https://youtu.be/ABCDEFG" can NOT have trailing "/"
+            print("extracting id from link: ", yt_link)
+            return yt_link.removesuffix("/").split("/")[-1]
+
+        elif "youtube.com" in yt_link:  # link looks like "https://www.youtube.com/watch?v=ABCDEFG&list=asdfgh&index=10"
+            print("extracting id from link: ", yt_link)
+            return yt_link.split("v=")[-1].split("&")[0]
+
+        else:
+            matches = re.match('^[a-zA-Z0-9_-]*$', yt_link)
+            # print(id)
+            if bool(matches) and len(yt_link) > 8:
+                return yt_link
+
+        raise ValueError(f"yt ID/link invalid: '{yt_link}'")
+
+    ####################################################################################################
+    # Artist data
+    ####################################################################################################
 
     @classmethod
     def get_artists(cls, artist_data: int | str | Artist | list[str | Artist]) -> list[Artist]:
@@ -106,51 +161,12 @@ class User_Input_Handler:
         raise TypeError(
             f"artist_data is of unsupported type: {type(artist_data)}")
 
-    @classmethod
-    def extract_yt_ID(cls, yt_link: str) -> str | None:
-        """
-        Extract YouTube video ID from a YouTube link
-
-        Parameters
-        ----------
-        yt_link : str
-            YouTube link in one of the following formats:\n
-            1 youtu.be/`yt_id`\n
-            2 youtube.com/watch?v=`yt_id`[&index=10] (can have more URL parameters but 'v=' MUST containe the video ID)
-
-        Returns
-        -------
-        `str`
-            contains the YouTube ideo ID
-
-        `None`
-            if yt_link is `None`
-
-        Raises
-        ------
-        ValueError
-            if no supported format is found for `yt_link`
-
-        """
-        if yt_link is None:
-            return None
-
-        if "youtu.be" in yt_link:  # link looks like "https://youtu.be/ABCDEFG" can NOT have trailing "/"
-            print("extracting id from link: ", yt_link)
-            return yt_link.removesuffix("/").split("/")[-1]
-
-        elif "youtube.com" in yt_link:  # link looks like "https://www.youtube.com/watch?v=ABCDEFG&list=asdfgh&index=10"
-            print("extracting id from link: ", yt_link)
-            return yt_link.split("v=")[-1].split("&")[0]
-
-        raise ValueError(f"yt link invalid: '{yt_link}'")
-
     ####################################################################################################
     # Get as type
     ####################################################################################################
 
     @classmethod
-    def get_as_type_or_none(cls, value: int | float | str | list, return_type: int | float | str, allow_epmty_str: bool = False, is_list: bool = False):
+    def get_as_type_or_none(cls, value: int | float | str | list, return_type: int | float | str | bool, allow_epmty_str: bool = False, is_list: bool = False):
         """
         Attempts to convert `value` to the type set by `return_type`
 
@@ -211,7 +227,10 @@ class User_Input_Handler:
             if value is None:
                 return None
 
-            if return_type == int:
+            if return_type == bool:
+                return cls.get_bool(value)
+
+            elif return_type == int:
                 return cls.get_int_or_none(value)
 
             elif return_type == float:
@@ -221,6 +240,13 @@ class User_Input_Handler:
                 return cls.get_str_or_none(value, allow_epmty_str)
 
         raise TypeError(f"Unsupported return_type set: {return_type}")
+
+    @classmethod
+    def get_bool(cls, value: str) -> int | None:
+        """Convert string to boolen
+        True values are 'true' and '1'
+        """
+        return value is not None and value.lower() in ["true", "1"]
 
     @classmethod
     def get_int_or_none(cls, value) -> int | None:

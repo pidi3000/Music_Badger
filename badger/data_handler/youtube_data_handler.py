@@ -44,8 +44,20 @@ class YouTube_Data_Handler:
         # print(response)
         # print("-"*20)
 
-        response["items"][0]["snippet"]["title"]
-        response["items"][0]["snippet"]["description"]
+        # TODO catch problems
+        # API errors -> quota exceeded
+        # invalid yt ID given -> items is empty
+
+        with open("temp/yt_data_raw.json", "w") as f:
+            json.dump(response, f, indent=4)
+
+        try:
+            response["items"][0]["snippet"]["title"]
+            response["items"][0]["snippet"]["description"]
+        except IndexError:
+            print(response)
+
+            raise
 
         self.yt_data_raw = response
 
