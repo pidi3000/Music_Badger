@@ -9,16 +9,16 @@ from flask import Flask, render_template, Response, url_for, redirect
 
 def _register_all_blueprints(app: Flask):
 
-    from . import api as routes
+    from badger import api as routes
     routes.init(app)
 
-    from . import web_song as routes
+    from badger import web_song as routes
     routes.init(app)
 
-    from . import web_artist as routes
+    from badger import web_artist as routes
     routes.init(app)
 
-    from . import web_youtube as routes
+    from badger import web_youtube as routes
     routes.init(app)
 
     pass
@@ -67,11 +67,11 @@ def _register_base_routes(app: Flask):
 
 
 def _init_db(app: Flask):
-    from .extension import db
+    from badger.extension import db
 
     db.init_app(app)
 
-    from . import db_models
+    from badger import db_models
     with app.app_context():
         db.create_all()
 

@@ -4,11 +4,10 @@ if TYPE_CHECKING:
     from ._artist import Artist
     from ._song_meta_data import Song_Meta_Data
 
-from . import db
-from . import _Base_Mixin
-# from ._artist import Artist
-from ._artist_song import _artist_song
-from ..data_handler.youtube_data_handler import YouTube_Data_Handler
+from badger.extension import db
+from badger.db_models import _Base_Mixin
+from badger.db_models._artist_song import _artist_song
+from badger.data_handler.youtube_data_handler import YouTube_Data_Handler
 
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped

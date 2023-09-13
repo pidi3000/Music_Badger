@@ -2,15 +2,13 @@
 
 # from ..db_models import
 
-import flask
 from flask import render_template, request, url_for, redirect, jsonify
-import json
 
 from . import blueprint as song_pages
-from ..data_handler.song_handler import Song, Artist
-from ..data_handler.user_input_handler import User_Input_Handler
 
-from ..help_functions import exception_to_dict
+from badger.data_handler.song_handler import Song, Artist
+from badger.data_handler.user_input_handler import User_Input_Handler
+from badger.help_functions import exception_to_dict
 
 import random
 from pprint import pprint

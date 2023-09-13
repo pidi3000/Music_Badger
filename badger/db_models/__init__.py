@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from ..extension import db
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import model
 
-import json
-from ..extension import MyJsonConvertable
+from badger.extension import db
+from badger.extension import MyJsonConvertable
 
 
 class _Base_Mixin(MyJsonConvertable):

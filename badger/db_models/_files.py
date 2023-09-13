@@ -1,5 +1,5 @@
-from . import db
-from . import _Base_Mixin
+from badger.extension import db
+from badger.db_models import _Base_Mixin
 
 from sqlalchemy.ext.hybrid import hybrid_property
 

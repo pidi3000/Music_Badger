@@ -1,4 +1,4 @@
-from . import db
+from badger.extension import db
 
 
 _artist_song = db.Table(

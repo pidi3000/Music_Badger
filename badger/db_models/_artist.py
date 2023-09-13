@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from . import db
-from . import _Base_Mixin
-from ._song_user_data import Song_User_Data
-from ._artist_song import _artist_song
+from badger.extension import db
+from badger.db_models import _Base_Mixin
+from badger.db_models._song_user_data import Song_User_Data
+from badger.db_models._artist_song import _artist_song
 
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped

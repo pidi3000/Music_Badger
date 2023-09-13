@@ -1,7 +1,7 @@
 
 import re
 
-from ..db_models import Artist
+from badger.db_models import Artist
 
 
 class User_Input_Handler:

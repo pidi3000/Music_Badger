@@ -7,13 +7,9 @@ from flask import render_template, request, url_for, redirect, jsonify
 import json
 
 from . import blueprint as ingest_pages
-from ..data_handler.song_handler import Artist
-from ..data_handler.user_input_handler import User_Input_Handler
-
-from ..help_functions import exception_to_dict
-
-import random
-from pprint import pprint
+from badger.data_handler.song_handler import Artist
+from badger.data_handler.user_input_handler import User_Input_Handler
+from badger.help_functions import exception_to_dict
 
 
 @ingest_pages.route('/')
@@ -24,7 +20,8 @@ def index():
 @ingest_pages.route('/get', methods=["GET", "POST"])
 def get():
     if request.method == 'POST':
-        id = User_Input_Handler.get_as_type_or_none(request.values.get("id"), int)
+        id = User_Input_Handler.get_as_type_or_none(
+            request.values.get("id"), int)
 
         try:
             artist = Artist.get_by_ID(id=id)
@@ -33,7 +30,7 @@ def get():
             response = exception_to_dict(e)
 
         return jsonify(response)
-    
+
     return render_template("artist_get.html")
 
 
@@ -41,4 +38,3 @@ def get():
 def list():
     all_artists = Artist.get_all()
     return render_template("artist_list.html", artists=all_artists)
-

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from . import db
-from . import _Base_Mixin
-from ._files import Audio_File, Image_File
-from ._song_user_data import Song_User_Data
-from ._publisher import Publisher
-from ..data_handler.youtube_data_handler import YouTube_Data_Handler
+from badger.extension import db
+from badger.db_models import _Base_Mixin
+from badger.db_models._files import Audio_File, Image_File
+from badger.db_models._song_user_data import Song_User_Data
+from badger.db_models._publisher import Publisher
+from badger.data_handler.youtube_data_handler import YouTube_Data_Handler
 
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql import func

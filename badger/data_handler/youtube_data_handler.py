@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from ..db_models import Artist
+    from badger.db_models import Artist
 
 import re
 import json
@@ -20,7 +20,7 @@ class YouTube_Data_Handler:
         self._load_yt_video_data_raw()
 
     def _load_yt_video_data_raw(self) -> dict:
-        from ..db_models import Song_Meta_Data
+        from badger.db_models import Song_Meta_Data
         meta_data = Song_Meta_Data.get_by_ytID(self.yt_id)
 
         print()
@@ -32,7 +32,7 @@ class YouTube_Data_Handler:
             # return
 
         print("DEBUG YT DATA: ", "loading from YT")
-        from ..web_youtube.routes import get_authorized_yt_obj
+        from badger.web_youtube.routes import get_authorized_yt_obj
         youtube = get_authorized_yt_obj()
 
         # https://developers.google.com/youtube/v3/docs/videos#resource-representation
@@ -171,7 +171,7 @@ class YouTube_Data_Handler:
         if user_artist_data is not None and (isinstance(user_artist_data, list) and len(user_artist_data) > 0):
             return user_artist_data
 
-        from ..db_models import Artist
+        from badger.db_models import Artist
         artist_list = []
         artists = self.get_song_artist_names()
 

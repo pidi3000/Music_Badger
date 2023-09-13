@@ -1,14 +1,10 @@
 
 
-from ..db_models import Song_Meta_Data, Song_User_Data, Artist, Publisher
-from ..extension import MyJsonConvertable
+from badger.db_models import Song_Meta_Data, Song_User_Data, Artist, Publisher
+from badger.extension import MyJsonConvertable
 
-from .user_input_handler import User_Input_Handler
-from .youtube_data_handler import YouTube_Data_Handler
-
-from flask import request
-
-from pprint import pprint
+from badger.data_handler.user_input_handler import User_Input_Handler
+from badger.data_handler.youtube_data_handler import YouTube_Data_Handler
 
 _debug = True
 
