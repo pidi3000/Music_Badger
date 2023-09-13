@@ -9,6 +9,7 @@ from flask import current_app
 import pyyoutube
 from pyyoutube import Client, AccessToken
 
+from badger.error import BadgerYTUserNotAuthorized
 
 # CACHING DATA, dict with 'client_id' and 'client_secret'
 _client_secret_data: dict = None
@@ -78,7 +79,8 @@ class YouTube_Auth_Handler:
     @classmethod
     def get_authorized_client(cls) -> pyyoutube.Client:
         if not cls.check_yt_authorized():
-            raise PermissionError("User must authorize service")
+            raise BadgerYTUserNotAuthorized(
+                "User must authorize service first. Goe through OAUTH flow first")
 
         access_token = cls.get_access_token()
         client_secrets = cls.get_client_secret_data()

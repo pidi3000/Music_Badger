@@ -3,7 +3,7 @@ import json
 from badger.extension import MyJsonConvertable
 
 __all__ = [
-    "BadgerBaseException", "BadgerEntryNotFound"
+    "BadgerBaseException", "BadgerEntryNotFound", "BadgerYTUserNotAuthorized"
 ]
 
 
@@ -71,9 +71,9 @@ class BadgerBaseException(Exception, MyJsonConvertable):
         return self.__repr__()
 
 
-class BadgerUserNotAuthorized(BadgerBaseException):
+class BadgerYTUserNotAuthorized(BadgerBaseException):
     def __init__(self, message: str) -> None:
-        super().__init__(message, error_type="UserNotAuthorized", status_code=400)
+        super().__init__(message, error_type="YTUserNotAuthorized", status_code=401)
 
 
 class BadgerEntryNotFound(BadgerBaseException):

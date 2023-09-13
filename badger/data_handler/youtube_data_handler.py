@@ -6,6 +6,8 @@ if TYPE_CHECKING:
 import re
 import json
 
+from badger.error import BadgerYTUserNotAuthorized
+
 YT_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
@@ -27,7 +29,7 @@ class YouTube_Data_Handler:
         if meta_data is not None:
             print("DEBUG YT DATA: ", "loading from DB")
             self.yt_data_raw = json.loads(meta_data.yt_data_raw)
-            return
+            # return
 
         print("DEBUG YT DATA: ", "loading from YT")
         from ..web_youtube.routes import get_authorized_yt_obj
