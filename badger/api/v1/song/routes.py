@@ -1,21 +1,20 @@
 
 
-from flask import request, jsonify
-import traceback
+from flask import request
 
 from . import blueprint as api_pages
 
-from ....data_handler.song_handler import Song
-from ....data_handler.user_input_handler import User_Input_Handler
-
-from ....help_functions import exception_to_dict, obj_list_to_json
+from badger.data_handler.api_response_handler import badger_Response
+from badger.data_handler.user_input_handler import User_Input_Handler
+from badger.data_handler.song_handler import Song
 
 
 ####################################################################################################
-# Handle song
+# Handle song routes
 ####################################################################################################
 
 @api_pages.route('/song', methods=["GET", "POST", "PUT"])
+@badger_Response
 def index():
     response = None
 
@@ -38,32 +37,29 @@ def index():
 
 
 @api_pages.route('/song/info', methods=["GET"])
+@badger_Response()
 def get_info():
     if request.method == 'GET':
         yt_id = User_Input_Handler.extract_yt_ID(request.values.get("yt_id"))
 
         print("yt_id: ", yt_id)
         # return str(yt_id), 200
-
-        try:
-            song_info = Song.get_info(yt_id=yt_id)
-            response = song_info
-        except (TypeError) as e:
-            response = exception_to_dict(e)
-            raise
-
-        return jsonify(response)
-
-    # return jsonify(exception_to_dict(NotImplementedError("")))
+        song_info = Song.get_info(yt_id=yt_id)
+        return song_info
 
 
 ####################################################################################################
-# Handle GET song
+# Handle song CRUD
 ####################################################################################################
+
+####################
+# GET
+####################
 def _handle_get_song():
     def _print_debug(var_name):
         return
-        print("DEBUG GET: ", var_name, "\t",request.values.get(var_name), "\t", type(request.values.get(var_name)))
+        print("DEBUG GET: ", var_name, "\t", request.values.get(
+            var_name), "\t", type(request.values.get(var_name)))
 
     _print_debug("all")
     _print_debug("id")
@@ -74,70 +70,44 @@ def _handle_get_song():
 
     if all:
         all_songs = Song.get_all()
-        return obj_list_to_json(all_songs)  # TODO use API response handler
+        return all_songs
 
     id = User_Input_Handler.get_as_type_or_none(request.values.get("id"), int)
-    yt_id = User_Input_Handler.extract_yt_ID(request.values.get("yt_id")) if id is None else None
+    yt_id = User_Input_Handler.extract_yt_ID(
+        request.values.get("yt_id")) if id is None else None
 
-    try:
-        new_song = Song.get(id=id, yt_id=yt_id)
-        response = new_song.to_json()
-    except (TypeError, LookupError) as e:
-        response = exception_to_dict(e)
-        traceback.print_exc()
-
-    # new_song = Artist.get_by_ID(2)
-    # response = (exception_to_dict(e))
-
-    return response
+    new_song = Song.get(id=id, yt_id=yt_id)
+    return new_song
 
 
-####################################################################################################
-# Handle ADD song
-####################################################################################################
+####################
+# ADD
+####################
 def _handle_add_song(song_data: dict):
-    response = None
-    try:
-        print("Debug ADD: ", song_data)
-        new_song = Song.create(
-            yt_id=song_data["yt_id"],
-            artist_data=song_data["artists"],
-            song_title=song_data["title"],
-            song_extras=song_data["extras"]
-        )
+    print("Debug ADD: ", song_data)
+    new_song = Song.create(
+        yt_id=song_data["yt_id"],
+        artist_data=song_data["artists"],
+        song_title=song_data["title"],
+        song_extras=song_data["extras"]
+    )
 
-        response = new_song.to_json()
-
-    except (ValueError, LookupError) as e:
-        # print("error")
-        # print(e)
-        response = (exception_to_dict(e))
-
-    return response
+    return new_song
 
 
-####################################################################################################
-# Handle EDIT song
-####################################################################################################
+####################
+# EDIT
+####################
 def _handle_edit_song(song_data: dict):
-    response = None
-    try:
-        print("Debug EDIT: ", song_data)
-        new_song = Song.edit(
-            yt_id=song_data["yt_id"],
-            artist_data=song_data["artists"],
-            song_title=song_data["title"],
-            song_extras=song_data["extras"]
-        )
+    print("Debug EDIT: ", song_data)
+    new_song = Song.edit(
+        yt_id=song_data["yt_id"],
+        artist_data=song_data["artists"],
+        song_title=song_data["title"],
+        song_extras=song_data["extras"]
+    )
 
-        response = new_song.to_json()
-
-    except (ValueError, LookupError) as e:
-        # print("error")
-        # print(e)
-        response = (exception_to_dict(e))
-
-    return response
+    return new_song
 
 
 ####################################################################################################

@@ -4,40 +4,25 @@ from flask import request, jsonify
 
 from . import blueprint as api_pages
 
-from ....data_handler.song_handler import Artist
-from ....data_handler.user_input_handler import User_Input_Handler
-
-from ....help_functions import exception_to_dict, obj_list_to_json
-
-from ....extension import db
+from badger.data_handler.api_response_handler import badger_Response
+from badger.data_handler.user_input_handler import User_Input_Handler
+from badger.db_models import Artist
 
 
 @api_pages.route('/artist', methods=["GET"])
+@badger_Response(debug=False)
 def index():
     if request.method == 'GET':
-        id = User_Input_Handler.get_as_type_or_none(request.values.get("id"), int)
+        id = User_Input_Handler.get_as_type_or_none(
+            request.values.get("id"), int)
 
-        print("Debug id: ", id)
-        
-        try:
-            artist = Artist.query.get_or_404(id)
-
-            # artist = Artist.get_by_ID(id=id)
-            response = artist.to_json()
-        except (TypeError, LookupError) as e:
-            response = exception_to_dict(e)
-
-        return jsonify(response)
-    
-    # return render_template("artist_get.html")
+        artist = Artist.get_by_ID(id=id)
+        return artist
 
 
-@api_pages.route('/artist/list', methods=["GET" ])
+@api_pages.route('/artist/list', methods=["GET"])
+@badger_Response
 def list():
     if request.method == 'GET':
         all_artists = Artist.get_all()
-
-        # return all_artists
-        return obj_list_to_json(all_artists)
-    # return render_template("artist_list.html", artists=all_artists)
-
+        return all_artists
