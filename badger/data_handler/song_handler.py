@@ -35,7 +35,6 @@ class Song(MyJsonConvertable):
         # two possible solutions:
         # 1. only commit on succes, revert/rollback DB on error https://docs.sqlalchemy.org/en/20/orm/session_transaction.html
         # 2. run garbage collection of unused entry
-
         """
         Adds a new song to the collection
 
@@ -108,13 +107,15 @@ class Song(MyJsonConvertable):
     @classmethod
     def edit(cls,
              yt_id: str,
-             artist_data: int | str | Artist | list[str | Artist],
-             song_title: str | None,
-             song_extras: str | list[str] | None
+             artist_data: int | str | Artist | list[str | Artist] = None,
+             song_title: str | None = None,
+             song_extras: str | list[str] | None = None
              ):
         # https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
         """
         Edit an existing song
+
+        Only the provide attributes are changed
 
         Parameters
         ----------            
@@ -300,7 +301,6 @@ class Song(MyJsonConvertable):
 
         if not yt_id:
             raise TypeError(f"yt_ID invalid: '{yt_id}'")
-
 
         song_meta_data = Song_Meta_Data.get_or_create(yt_id)
         youtube_data_handler = YouTube_Data_Handler(yt_id=yt_id)

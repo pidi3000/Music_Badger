@@ -182,12 +182,16 @@ class Song_User_Data(_Base_Mixin, db.Model):
              user_extras: str | list[str] | None = None
              ) -> Song_User_Data:
 
-        self.name = user_song_title
-        self.extras = user_extras
+        if user_song_title is not None: 
+            self.name = user_song_title 
 
-        self.artist_list.clear()
-        self.artist_list.extend(user_artist_list)
-        # print("DEBUG create:", artist_list)
+        if user_extras is not None: 
+            self.extras = user_extras
+
+        if user_artist_list is not None and len(user_artist_list) > 0: 
+            # print("DEBUG create:", user_artist_list)
+            self.artist_list.clear()
+            self.artist_list.extend(user_artist_list)
 
         db.session.commit()
 
