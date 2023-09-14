@@ -9,8 +9,18 @@ import functools
 
 def badger_Response(_func=None, *, debug: bool = False):
     """Badger response decorator
-    
-    converts the functions return valuse to the API response structure
+
+    converts the functions return valuse to the API response structure.\n
+    The decorated function can return a single `item` or a `tuple(item, status_code)`.\n
+    The status_code is used as the HTTP status code, with the default being `200`.\n
+    The returned `item` CAN NOT be a tuple, unless a status_code is returned as well.\n
+    in this case the status_code can be `None`\n
+    For example like this 
+    ```
+        status_code = 300 # or None
+        item = (1, 5, "data")
+        return  (item, status_code)
+    ```
     """
     def badger_Response_decorator(func):
         @functools.wraps(func)
@@ -20,7 +30,12 @@ def badger_Response(_func=None, *, debug: bool = False):
 
             try:
                 item = func(*args, **kwargs)
+                status_code = None  # http status code
 
+                if isinstance(item, tuple):
+                    status_code = item[1]
+                    item = item[0]
+                    
                 if item is None:
                     raise BadgerEntryNotFound("No matching entry found")
 
@@ -36,7 +51,7 @@ def badger_Response(_func=None, *, debug: bool = False):
                 print("return_items", return_items)
                 print("errors", errors)
 
-            return API_Response_Handler(items=return_items, errors=errors).get_response()
+            return API_Response_Handler(items=return_items, errors=errors, status_code=status_code).get_response()
 
         return handle_response
 
@@ -47,13 +62,21 @@ def badger_Response(_func=None, *, debug: bool = False):
 
 
 class API_Response_Handler():
+    status_code = 200 # HTTP status code
+
     items = []
     # warnings = []
     errors = []
 
-    def __init__(self, items: list[MyJsonConvertable | dict] = None, errors: list[BadgerBaseException] = None) -> None:
+    def __init__(self,
+                 items: list[MyJsonConvertable | dict] = None,
+                 errors: list[BadgerBaseException] = None,
+                 status_code: int = None) -> None:
         self.items = items
         self.errors = errors
+    
+        if status_code is not None:
+            self.status_code = status_code
 
     def get_response(self) -> (dict, int):
         """Returns a response dict and status code
@@ -64,7 +87,7 @@ class API_Response_Handler():
             # "errors": None,
         }
 
-        status_code = 200
+        # status_code = 200
 
         errors = self._handle_data(data=self.errors)
 
@@ -74,9 +97,9 @@ class API_Response_Handler():
 
         else:
             response_obj["errors"] = errors
-            status_code = self._get_status_code(self.errors)
+            self.status_code = self._get_status_code(self.errors)
 
-        return (response_obj, status_code)
+        return (response_obj, self.status_code)
 
     @classmethod
     def construct_response_obj(cls, items: list[MyJsonConvertable | dict] = None, errors: list[BadgerBaseException] = None):

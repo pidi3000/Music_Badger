@@ -71,11 +71,16 @@ class BadgerBaseException(Exception, MyJsonConvertable):
         return self.__repr__()
 
 
+class BadgerMisingParameter(BadgerBaseException):
+    def __init__(self, message: str = "One of the requiered parameters is missing") -> None:
+        super().__init__(message, error_type="MissingParameter", status_code=400)
+
+
 class BadgerYTUserNotAuthorized(BadgerBaseException):
-    def __init__(self, message: str) -> None:
-        super().__init__(message, error_type="YTUserNotAuthorized", status_code=401)
+    def __init__(self, message: str = "Service not authorized on users YouTube Account") -> None:
+        super().__init__(message, error_type="YTUserNotAuthorized", status_code=403)
 
 
 class BadgerEntryNotFound(BadgerBaseException):
-    def __init__(self, message: str) -> None:
+    def __init__(self, message: str = "Requested resource could not be found") -> None:
         super().__init__(message, error_type="EntryNotFound", status_code=404)

@@ -17,6 +17,7 @@ from badger.data_handler.song_handler import Song
 @badger_Response
 def index():
     response = None
+    status_code = None
 
     if request.method == 'GET':
         # response = handle_get_song_path()
@@ -26,14 +27,14 @@ def index():
         # response = handle_add_song_path()
         song_data = _get_song_data()
         response = _handle_add_song(song_data)
+        status_code = 201
 
     if request.method == 'PUT':
         # response = handle_edit_song_path()
         song_data = _get_song_data()
         response = _handle_edit_song(song_data)
 
-    return response
-    # return jsonify(response)
+    return response, status_code
 
 
 @api_pages.route('/song/info', methods=["GET"])
@@ -43,7 +44,6 @@ def get_info():
         yt_id = User_Input_Handler.extract_yt_ID(request.values.get("yt_id"))
 
         print("yt_id: ", yt_id)
-        # return str(yt_id), 200
         song_info = Song.get_info(yt_id=yt_id)
         return song_info
 
