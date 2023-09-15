@@ -33,11 +33,11 @@ class Song_User_Data(_Base_Mixin, db.Model):
     ################################
     # info
     ################################
-    name: str = db.Column(db.String(200), nullable=False)
+    title: str = db.Column(db.String(200), nullable=False)
     extras: str = db.Column(db.String(1000), nullable=True)
 
     def __repr__(self):
-        return f'<Song_User_Data {self.name}>'
+        return f'<Song_User_Data {self.title}>'
 
     ################################################################
     # Class functions
@@ -58,7 +58,7 @@ class Song_User_Data(_Base_Mixin, db.Model):
             yt_id=Song_Meta_Data.get(id=meta_data_id).yt_id)
 
         user_data: Song_User_Data = super().create(
-            name=yt_data_handler.get_song_title(user_song_title),
+            title=yt_data_handler.get_song_title(user_song_title),
             extras=yt_data_handler.get_song_extras(user_extras),
             meta_data_id=meta_data_id
         )
@@ -182,7 +182,7 @@ class Song_User_Data(_Base_Mixin, db.Model):
              ) -> Song_User_Data:
 
         if user_song_title is not None: 
-            self.name = user_song_title 
+            self.title = user_song_title 
 
         if user_extras is not None: 
             self.extras = user_extras

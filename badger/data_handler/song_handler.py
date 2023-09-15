@@ -314,7 +314,7 @@ class Song(MyJsonConvertable):
         song_dict = {
             "id": None,
             "yt_id": song_meta_data.yt_id,
-            "name": youtube_data_handler.get_song_title(),
+            "title": youtube_data_handler.get_song_title(),
             "extras": youtube_data_handler.get_song_extras(),
             "artists": artists,
             "publisher": {
@@ -356,7 +356,7 @@ class Song(MyJsonConvertable):
         {
             "id": 0,
             "yt_id": "",
-            "name": "",
+            "title": "",
             "extras": "",
             "artists": [ # list of all artists
                 {
@@ -397,7 +397,7 @@ class Song(MyJsonConvertable):
         song_dict = {
             "id": self.user_data.id,
             "yt_id": self.meta_data.yt_id,
-            "name": self.user_data.name,
+            "title": self.user_data.title,
             "extras": self.user_data.extras,
             "artists": artists,
             "publisher": {

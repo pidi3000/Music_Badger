@@ -63,7 +63,8 @@ def check_secret_file_exists():
 @youtube_auth_pages.route('/management')
 def management():
     secret_file_found = check_secret_file_exists()
-    return render_template("youtube_management.html", secret_file_found=secret_file_found)
+    session_value_set = 'credentials_MAIN' in flask.session
+    return render_template("youtube_management.html", secret_file_found=secret_file_found, session_value_set=session_value_set)
 
 
 @youtube_auth_pages.route('/authorize')

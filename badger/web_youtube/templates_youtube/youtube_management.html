@@ -11,6 +11,7 @@
 
 <h2 data-autoset-text-color="true">Upload client secret File: </h2>
 <h2 style="color: {% if secret_file_found %} green {% else %} red {% endif%};">File found: {{secret_file_found}}
+<h2 style="color: {% if session_value_set %} green {% else %} red {% endif%};">Credentials set: {{session_value_set}}
 </h2>
 <form method=post enctype=multipart/form-data action="{{ url_for('.set_client_secret') }}" data-autoset-text-color="true">
     <input type=file name=file>
