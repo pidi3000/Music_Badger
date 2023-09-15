@@ -1,0 +1,15 @@
+_id: env_5ed822dca3074396a4d5ef71e50cf32c
+type: Environment
+parentId: env_1fe9ab11556e9f4178b0b4c5ab196e74e6e6b377
+modified: 1694746189925
+created: 1694746162314
+name: Browser agent
+data:
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
+    like Gecko) Chrome/116.0.0.0 Safari/537.36
+dataPropertyOrder:
+  "&":
+    - User-Agent
+color: null
+isPrivate: false
+metaSortKey: 1694746162314

@@ -1,0 +1,28 @@
+_id: req_7f4a6473cc7c4e5fb40ba8f3cec71402
+type: Request
+parentId: fld_8133e28fd4724c6ebf21a2f078815944
+modified: 1694746283685
+created: 1694725166588
+url: "{{ _.base_url }}/artist"
+name: get a artist
+description: ""
+method: GET
+body: {}
+parameters:
+  - name: id
+    disabled: false
+    value: "0"
+headers:
+  - id: pair_9443359c7c82419980cad1667e4d3700
+    name: User-Agent
+    value: "{{ _['User-Agent'] }}"
+    description: ""
+authentication: {}
+metaSortKey: -1694725166588
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

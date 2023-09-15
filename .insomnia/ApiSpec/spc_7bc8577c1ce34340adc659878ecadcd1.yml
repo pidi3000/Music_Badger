@@ -1,7 +1,7 @@
 _id: spc_7bc8577c1ce34340adc659878ecadcd1
 type: ApiSpec
 parentId: wrk_9a7e101ed6074e1d86ec1cbe13315821
-modified: 1694724023752
+modified: 1694737906255
 created: 1694462417687
 fileName: my-spec.yaml
 contents: >
@@ -217,7 +217,7 @@ contents: >
       get:
         tags:
           - youtube
-        summary: Start YouTube OAuth flow
+        summary: Start OAuth flow
         description: "The OAuth flow starts here.\n\n Returns a URL the client has to visit and authorize the service on their YouTube Account "
 
         operationId: yt_Authorize
@@ -237,8 +237,8 @@ contents: >
       post:
         tags:
           - youtube
-        summary: Finish YouTube OAuth Flow
-        description: "Callback enpoint to handle the YouTube OAuth repsone."
+        summary: Finish OAuth Flow
+        description: "Callback endpoint to handle the YouTube OAuth repsone."
 
         operationId: yt_oauth2callback
 
@@ -258,20 +258,25 @@ contents: >
             description: OK
 
           "400":
-            description: The provide 'authorization_response' is invalid
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    oauth_url:
-                      type: string
+            description: The provided 'authorization_response' is invalid
+            
+      get:
+        tags:
+          - youtube
+        summary: Finish OAuth Flow
+        description: "Callback URL can be set to this endpoint to handle the YouTube OAuth repsone."
+
+        operationId: yt_oauth2callback_get
+
+        responses:
+          "204":
+            description: OK
 
     /yt/revoke:
       delete:
         tags:
           - youtube
-        summary: Revoke YouTube credentials
+        summary: Revoke credentials
         description: "Revoke the Youtube credentials, user will have to re-authorize the service again"
 
         operationId: yt_revoke

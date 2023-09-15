@@ -1,0 +1,25 @@
+_id: req_cbed17f1e5bf4679a2dc6d39400f8957
+type: Request
+parentId: fld_882e2a5d64164bf882e963bb004d1b7f
+modified: 1694746273848
+created: 1694725166632
+url: "{{ _.base_url }}/yt/revoke"
+name: Revoke YouTube credentials
+description: ""
+method: DELETE
+body: {}
+parameters: []
+headers:
+  - id: pair_1b7b8d202fee4463a1aa0d53e271b987
+    name: User-Agent
+    value: "{{ _['User-Agent'] }}"
+    description: ""
+authentication: {}
+metaSortKey: -1694725166632
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

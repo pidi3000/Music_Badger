@@ -1,0 +1,30 @@
+_id: req_a8aa1ff6a01d4710ab9e2eb3a2cdc629
+type: Request
+parentId: fld_882e2a5d64164bf882e963bb004d1b7f
+modified: 1694746309245
+created: 1694744446646
+url: "{{ _.base_url }}/yt/test"
+name: YT test
+description: ""
+method: GET
+body: {}
+parameters: []
+headers:
+  - name: User-Agent
+    value: insomnia/2023.5.8
+    id: pair_29843e86825341df9d8a336d14e36ab3
+    disabled: true
+  - id: pair_9b5434c0afe14514b3228abb2c6269a8
+    name: User-Agent
+    value: "{{ _['User-Agent'] }}"
+    description: ""
+    disabled: false
+authentication: {}
+metaSortKey: -1694744446646
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

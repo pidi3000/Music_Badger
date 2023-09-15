@@ -1,0 +1,25 @@
+_id: req_d82f8124e41f48778bcf31243de83058
+type: Request
+parentId: fld_882e2a5d64164bf882e963bb004d1b7f
+modified: 1694746278378
+created: 1694725166598
+url: "{{ _.base_url }}/yt/authorize"
+name: Start YouTube OAuth flow
+description: ""
+method: GET
+body: {}
+parameters: []
+headers:
+  - id: pair_1ea77983feba4610a9e59942db1378e2
+    name: User-Agent
+    value: "{{ _['User-Agent'] }}"
+    description: ""
+authentication: {}
+metaSortKey: -1694725166598
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

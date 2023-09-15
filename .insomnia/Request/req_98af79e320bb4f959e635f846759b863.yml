@@ -1,0 +1,29 @@
+_id: req_98af79e320bb4f959e635f846759b863
+type: Request
+parentId: fld_c9b89e2a682d486991b65982d3c254c5
+modified: 1694746285586
+created: 1694725166584
+url: "{{ _.base_url }}/song/info"
+name: Get song info
+description: ""
+method: GET
+body: {}
+parameters:
+  - name: yt_id
+    disabled: false
+    value: https://www.youtube.com/watch?v=S6jhwFQaGHc
+    id: pair_53df4daf4e7e4b1cb174c4fdfb6aad02
+headers:
+  - id: pair_567e48221a2842fdabcbb3b08ab499a5
+    name: User-Agent
+    value: "{{ _['User-Agent'] }}"
+    description: ""
+authentication: {}
+metaSortKey: -1694725166584
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

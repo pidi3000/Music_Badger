@@ -1,0 +1,39 @@
+_id: req_28e4a9105ef0483bbc29e0d793d906a4
+type: Request
+parentId: fld_c9b89e2a682d486991b65982d3c254c5
+modified: 1694746288091
+created: 1694725166579
+url: "{{ _.base_url }}/song"
+name: Edit existing Song
+description: ""
+method: PUT
+body:
+  mimeType: application/json
+  text: |-
+    {
+      "yt_id": "string",
+      "artists": [
+        "string"
+      ],
+      "title": "string",
+      "extras": "string"
+    }
+parameters: []
+headers:
+  - name: Content-Type
+    disabled: false
+    value: application/json
+    id: pair_34a851f7d19e4407a6591776e3c6276b
+  - id: pair_d7c996e71c87463381a4c82da0564816
+    name: User-Agent
+    value: "{{ _['User-Agent'] }}"
+    description: ""
+authentication: {}
+metaSortKey: -1694725166579
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

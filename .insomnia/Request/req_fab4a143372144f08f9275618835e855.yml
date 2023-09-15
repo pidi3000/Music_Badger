@@ -1,0 +1,39 @@
+_id: req_fab4a143372144f08f9275618835e855
+type: Request
+parentId: fld_c9b89e2a682d486991b65982d3c254c5
+modified: 1694746290134
+created: 1694725166574
+url: "{{ _.base_url }}/song"
+name: Add new Song
+description: ""
+method: POST
+body:
+  mimeType: application/json
+  text: |-
+    {
+      "yt_id": "string",
+      "artists": [
+        "string"
+      ],
+      "title": "string",
+      "extras": "string"
+    }
+parameters: []
+headers:
+  - name: Content-Type
+    disabled: false
+    value: application/json
+    id: pair_e91a39bbc44a4b1589f039a8b5775360
+  - id: pair_3b3d088835e64175aa55329043067650
+    name: User-Agent
+    value: "{{ _['User-Agent'] }}"
+    description: ""
+authentication: {}
+metaSortKey: -1694725166574
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

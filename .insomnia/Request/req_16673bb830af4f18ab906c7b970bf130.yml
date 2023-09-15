@@ -1,0 +1,34 @@
+_id: req_16673bb830af4f18ab906c7b970bf130
+type: Request
+parentId: fld_c9b89e2a682d486991b65982d3c254c5
+modified: 1694746292212
+created: 1694725166568
+url: "{{ _.base_url }}/song"
+name: Get songs
+description: ""
+method: GET
+body: {}
+parameters:
+  - name: yt_id
+    disabled: false
+    value: string
+  - name: id
+    disabled: false
+    value: "0"
+  - name: all
+    disabled: false
+    value: "null"
+headers:
+  - id: pair_c17a3ab6c24a4899a3957c9c4120b0e7
+    name: User-Agent
+    value: "{{ _['User-Agent'] }}"
+    description: ""
+authentication: {}
+metaSortKey: -1694725166568
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global
