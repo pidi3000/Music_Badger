@@ -36,8 +36,11 @@ class YouTube_Auth_Handler:
     @classmethod
     def get_client_secret_data(cls):
         global _client_secret_data
+
         if _client_secret_data is not None:
             return _client_secret_data
+
+        _client_secret_data = {}
 
         CLIENT_SECRETS_FILE = cls.get_client_secrets_file_path()
 
@@ -58,15 +61,48 @@ class YouTube_Auth_Handler:
     @classmethod
     def get_access_token(cls) -> AccessToken:
         # can raise KeyError, must firts run check_yt_authorized to verify
-        return AccessToken.from_json(flask.session[cls.SESSION_NAME_ACCESSTOKEN])
+        cls.assert_yt_authorized()
+        return AccessToken.from_json(flask.session.get(cls.SESSION_NAME_ACCESSTOKEN))
 
     @classmethod
     def save_access_token(cls, access_token: AccessToken):
+        # TODO split and use a string for access and refresh token,
+        # using AccessToken class is too confusing
         flask.session[cls.SESSION_NAME_ACCESSTOKEN] = access_token.to_json()
+
+    @classmethod
+    def delete_access_token(cls):
+        # flask.session[cls.SESSION_NAME_ACCESSTOKEN] = None
+        flask.session.pop(cls.SESSION_NAME_ACCESSTOKEN)
+        # del flask.session[cls.SESSION_NAME_ACCESSTOKEN]
 
     ####################################################################################################
     # Authorization functions
     ####################################################################################################
+
+    @classmethod
+    def assert_yt_authorized(cls) -> bool:
+        """ Assert YT credentials exist
+
+        Check if the users YT account has authorized the service and client secret file exist
+        Otherwise rasie exceptions
+
+        Raises
+        ------
+        BadgerYTUserNotAuthorized
+            when the youtube has not authorized the service
+
+        FileNotFoundError
+            when the client secret file was not found        
+
+        """
+
+        FileNotFoundError
+        if cls.SESSION_NAME_ACCESSTOKEN not in flask.session:
+            raise BadgerYTUserNotAuthorized()
+
+        if not cls.check_secret_file_exists():
+            raise FileNotFoundError("Client secret file not found")
 
     @classmethod
     def check_yt_authorized(cls) -> bool:
@@ -78,9 +114,7 @@ class YouTube_Auth_Handler:
 
     @classmethod
     def get_authorized_client(cls) -> pyyoutube.Client:
-        if not cls.check_yt_authorized():
-            raise BadgerYTUserNotAuthorized(
-                "User must authorize service first. Goe through OAUTH flow first")
+        cls.assert_yt_authorized()
 
         access_token = cls.get_access_token()
         client_secrets = cls.get_client_secret_data()
@@ -104,7 +138,7 @@ class YouTube_Auth_Handler:
     # store access and refresh token (in SESSION or DB or FILE)
 
     @classmethod
-    def _get_default_auth_client(cls) -> pyyoutube.Client:
+    def _get_default_auth_client(cls, redirect_uri: str = None) -> pyyoutube.Client:
         client_secrets = cls.get_client_secret_data()
         client = Client(
             client_id=client_secrets["client_id"],
@@ -114,6 +148,9 @@ class YouTube_Auth_Handler:
         # TODO set default values
         # override redirect URI
         # client.DEFAULT_REDIRECT_URI = flask.url_for('.oauth2callback', _external=True)
+        # default_redirect = "http://localhost:5000/api/v1/yt/oauth2callback"
+        default_redirect = "http://localhost:5000/yt/oauth2callback"
+        client.DEFAULT_REDIRECT_URI = default_redirect if redirect_uri is None else redirect_uri
 
         # Scope
         # client.DEFAULT_SCOPE  = flask.url_for('.oauth2callback', _external=True)
@@ -121,13 +158,13 @@ class YouTube_Auth_Handler:
         return client
 
     @classmethod
-    def get_authorization_url(cls) -> str:
+    def get_authorization_url(cls, redirect_uri: str = None) -> str:
         """
         Returns
             url: Authorize url for user.
         """
 
-        client = cls._get_default_auth_client()
+        client = cls._get_default_auth_client(redirect_uri=redirect_uri)
 
         authorize_url, state = client.get_authorize_url(
             # access_type=`online` or `offline`
@@ -150,12 +187,33 @@ class YouTube_Auth_Handler:
 
         client = cls._get_default_auth_client()
 
+        state = flask.session[cls.SESSION_NAME_YT_AUTH_STATE]
+
         access_token: AccessToken = client.generate_access_token(
-            authorization_response=response_uri, scope=flask.session[cls.SESSION_NAME_YT_AUTH_STATE])
+            authorization_response=response_uri,
+            state=state
+        )
 
         cls.save_access_token(access_token=access_token)
 
     @classmethod
-    def revoke_access_token(cls):
-        # TODO IMPLEMENT token revoke
-        raise NotImplementedError("soonTM")
+    def revoke_access_token(cls) -> bool:
+        if cls.check_yt_authorized():
+            client = cls._get_default_auth_client()
+            token = cls.get_access_token()
+
+            print()
+            print("DEBUG OAuth token: ", token, type(token))
+            print("DEBUG OAuth token: ", token.access_token,
+                  type(token.access_token))
+            print()
+            print()
+
+            cls.delete_access_token()
+
+            status = client.revoke_access_token(token=token.access_token)
+
+            return status
+
+        raise BadgerYTUserNotAuthorized(
+            message="No credentials exist for user to revoke", status_code=404)
