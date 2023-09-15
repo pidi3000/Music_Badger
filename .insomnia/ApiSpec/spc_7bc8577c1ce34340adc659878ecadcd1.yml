@@ -1,0 +1,640 @@
+_id: spc_7bc8577c1ce34340adc659878ecadcd1
+type: ApiSpec
+parentId: wrk_9a7e101ed6074e1d86ec1cbe13315821
+modified: 1694724023752
+created: 1694462417687
+fileName: my-spec.yaml
+contents: >
+  openapi: 3.1.0
+
+  info:
+    title: Music Badger
+    description: "Music organization app"
+    version: 1.0.0
+    contact:
+      email: pidi3000@llive.com
+    license:
+      name: Apache 2.0
+      url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+  ##################################################
+
+  externalDocs:
+    description: Github repo
+    url: https://github.com/pidi3000/Music_Badger
+
+  ##################################################
+
+  servers:
+    - description: local server
+      url: http://localhost:5000/api/v1
+
+  #   - description: computed
+
+  #     url: http://localhost:{port}/api/{basePath}
+
+  #     variables:
+
+  #       port:
+
+  #         enum:
+
+  #           - '5000'
+
+  #           - '443'
+
+  #         default: '5000'
+
+  #       basePath:
+
+  #         default: v1
+
+
+  ##################################################
+
+  tags:
+    - name: song
+      description: Everything about Songs
+    - name: artist
+      description: Everything about Artists
+    - name: youtube
+      description: Everything about YouTube auth
+
+  ##################################################
+
+  paths:
+    ##################################################
+    # Song pages
+    ##################################################
+    /song:
+      get:
+        tags:
+          - song
+        summary: Get songs
+        description: "Get a song by DB_ID or YT_ID/Link or get ALL \n\nWARNING: exactly 1 parameter **MUST** be set\n\nIf multiple parameters are set they are handle with following priorety: (high to low)\n\n **all > id > yt_id**"
+
+        operationId: getSong
+
+        parameters:
+          - $ref: "#/components/parameters/yt_id"
+          - $ref: "#/components/parameters/db_id"
+          - name: all
+            in: query
+            description: retrive all songs
+            required: true
+            schema:
+              type: bool
+              nullable: true
+              enum:
+                - "false"
+                - "true"
+
+        responses:
+          "200":
+            $ref: "#/components/responses/200-song"
+
+          "400":
+            $ref: "#/components/responses/400-gen"
+
+          "404":
+            $ref: "#/components/responses/404-gen"
+
+      post:
+        tags:
+          - song
+        summary: Add new Song
+        description: "Add new Song using YT_ID/Link"
+
+        operationId: addSong
+
+        requestBody:
+          #         $ref: "#/components/requestBodies/SongList"
+          $ref: "#/components/requestBodies/Song"
+
+        responses:
+          "201":
+            $ref: "#/components/responses/200-song"
+
+          "400":
+            $ref: "#/components/responses/400-gen"
+
+          "403":
+            $ref: "#/components/responses/403-gen"
+
+          "404":
+            $ref: "#/components/responses/404-gen"
+            description: No YouTube video could be found
+
+      put:
+        tags:
+          - song
+        summary: Edit existing Song
+        description: "Edit existing Song using YT_ID/Link\n\n
+          Songs are identefied by the YouTube ID. Only the provided fields will be changed."
+
+        operationId: editSong
+
+        requestBody:
+          $ref: "#/components/requestBodies/Song"
+
+        responses:
+          "200":
+            $ref: "#/components/responses/200-song"
+
+          "400":
+            $ref: "#/components/responses/400-gen"
+
+          "404":
+            $ref: "#/components/responses/404-gen"
+
+    /song/info:
+      get:
+        tags:
+          - song
+        summary: Get song info
+        description: "Get info about song before adding it.\n\n
+          Useful for getting auto generated Song info"
+
+        operationId: getSongInfo
+
+        parameters:
+          - $ref: "#/components/parameters/yt_id"
+
+        responses:
+          "200":
+            $ref: "#/components/responses/200-song-info"
+
+          "400":
+            $ref: "#/components/responses/400-gen"
+
+          "403":
+            $ref: "#/components/responses/403-gen"
+
+          "404":
+            $ref: "#/components/responses/404-gen"
+
+    ##################################################
+    # Artist pages
+    ##################################################
+    /artist:
+      get:
+        tags:
+          - artist
+        summary: get a artist
+        description: "Get a artist by DB_ID"
+
+        operationId: getArtist
+
+        parameters:
+          - $ref: "#/components/parameters/db_id"
+
+        responses:
+          "200":
+            $ref: "#/components/responses/200-artist"
+          #           description: temp
+
+          "404":
+            $ref: "#/components/responses/404-gen"
+    #           description: Can not load artist
+
+    /artist/list:
+      get:
+        tags:
+          - artist
+        summary: Get all Artists
+        description: "Get a list of ALL Artists"
+
+        operationId: getArtistList
+
+        responses:
+          "200":
+            $ref: "#/components/responses/200-artist"
+
+    ##################################################
+    # YouTube pages
+    ##################################################
+    /yt/authorize:
+      get:
+        tags:
+          - youtube
+        summary: Start YouTube OAuth flow
+        description: "The OAuth flow starts here.\n\n Returns a URL the client has to visit and authorize the service on their YouTube Account "
+
+        operationId: yt_Authorize
+
+        responses:
+          "200":
+            description: Returns YouTube OAuth URL
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    oauth_url:
+                      type: string
+
+    /yt/oauth2callback:
+      post:
+        tags:
+          - youtube
+        summary: Finish YouTube OAuth Flow
+        description: "Callback enpoint to handle the YouTube OAuth repsone."
+
+        operationId: yt_oauth2callback
+
+        requestBody:
+          description: url the YouTube authentication server redirected to
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authorization_response:
+                    type: string
+
+        responses:
+          "204":
+            description: OK
+
+          "400":
+            description: The provide 'authorization_response' is invalid
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    oauth_url:
+                      type: string
+
+    /yt/revoke:
+      delete:
+        tags:
+          - youtube
+        summary: Revoke YouTube credentials
+        description: "Revoke the Youtube credentials, user will have to re-authorize the service again"
+
+        operationId: yt_revoke
+
+        responses:
+          "204":
+            description: credentials have been revoked
+
+          "404":
+            $ref: "#/components/responses/404-yt"
+
+  ###########################################################################
+
+  components:
+    #########################
+    parameters:
+      yt_id:
+        name: yt_id
+        in: query
+        description: YT video ID or link (in supported format)
+        required: true
+        schema:
+          type: string
+
+      db_id:
+        name: id
+        in: query
+        description: internal DB ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    #########################
+    requestBodies:
+      Song:
+        description: Basic Song info. Only yt_id **MUST** be set, others can be omitted
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SongAdd"
+
+      SongList:
+        description: List of song info to create. Only yt_id **MUST** be set, others can be omitted
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                songs:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/SongAdd"
+
+    ###########################################################################
+    # Resopnses
+    ###########################################################################
+    responses:
+
+      ##################################################
+      # General stuff
+      ##################################################
+      400-gen:
+        description: Mising Parameters
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                errors:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Error"
+                    example:
+                      type: "MissingParameter"
+                      message: "One of the requiered parameters is missing"
+
+      403-gen:
+        description: User must first Authorize service on their YouTube Account
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                errors:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Error"
+                    example:
+                      type: "YTUserNotAuthorized"
+                      message: "Service not authorized on users YouTube Account"
+
+      404-gen:
+        description: Requested resource could not be found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                errors:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Error"
+                    example:
+                      type: "EntryNotFound"
+                      message: "Requested resource could not be found"
+
+      ##################################################
+      # Song stuff
+      ##################################################
+      200-song:
+        description: return Song list
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  #                 $ref: "#/components/schemas/SongList"
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Song"
+                warnings:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Warning"
+      200-song-info:
+        description: return Song list
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  #                 $ref: "#/components/schemas/SongList"
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/SongInfo"
+                warnings:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Warning"
+      200-song-add:
+        description: return Song ID's (yt_id, db_id)
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  #                 $ref: "#/components/schemas/SongList"
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      db_id:
+                        type: string
+                      yt_id:
+                        type: string
+
+                warnings:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Warning"
+
+      ##################################################
+      # Artist stuff
+      ##################################################
+      200-artist:
+        description: return artist list
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  #                 $ref: "#/components/schemas/SongList"
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Artist"
+                warnings:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Warning"
+
+      ##################################################
+      # YouTUbe stuff
+      ##################################################
+      200-yt:
+        description: return artist list
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  #                 $ref: "#/components/schemas/SongList"
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Artist"
+                warnings:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Warning"
+
+      404-yt:
+        description: No credentials exist for user to revoke
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                errors:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Error"
+                    example:
+                      type: "NoCredentialsSaved"
+                      message: "No credentials found to revoke"
+    ###########################################################################
+    schemas:
+      ##################################################
+      # Recources
+      ##################################################
+      Song:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          yt_id:
+            type: string
+            description: YouTube video ID
+          name:
+            type: string
+            description: song name
+          extras:
+            type: string
+            description: song extras (remix, etc.)
+          artists:
+            $ref: "#/components/schemas/ArtistList"
+          publisher:
+            $ref: "#/components/schemas/Publisher"
+
+        xml:
+          name: Song
+
+      SongInfo:
+        type: object
+        properties:
+          yt_id:
+            type: string
+            description: YouTube video ID
+          name:
+            type: string
+            description: song name
+          extras:
+            type: string
+            description: song extras (remix, etc.)
+          artists:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Artist name
+
+          publisher:
+            $ref: "#/components/schemas/Publisher"
+
+        xml:
+          name: Song
+
+      Artist:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+            description: Artist name
+          num_songs:
+            type: integer
+            format: int64
+
+        xml:
+          name: Artist
+
+      Publisher:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+            description: Publisher name
+
+        xml:
+          name: Publisher
+
+      ##################################################
+      # Warnings / Errors
+      ##################################################
+      Error:
+        type: object
+        properties:
+          type:
+            type: string
+            description: Error type
+          message:
+            type: string
+            description: Error message
+
+      #########################
+      Warning:
+        type: object
+        properties:
+          type:
+            type: string
+            description: Warning type
+          message:
+            type: string
+            description: Warning message
+
+      ##################################################
+      ##################################################
+      SongAdd:
+        type: object
+        properties:
+          yt_id:
+            type: string
+            description: YT ID or Link
+
+          artists:
+            type: array
+            items:
+              type: string
+
+          title:
+            type: string
+
+          extras:
+            type: string
+
+      ##################################################
+      # Helper lists
+      ##################################################
+      SongList:
+        type: array
+        description: Song list (for easier reuseabilety)
+        items:
+          $ref: "#/components/schemas/Song"
+
+      #########################
+      ArtistList:
+        type: array
+        description: Artist list (for easier reuseabilety)
+        items:
+          $ref: "#/components/schemas/Artist"
+  ##################################################
+contentType: yaml
