@@ -32,18 +32,26 @@ class YouTube_Data_Handler:
             # return
 
         print("DEBUG YT DATA: ", "loading from YT")
-        from badger.web_youtube.routes import get_authorized_yt_obj
-        youtube = get_authorized_yt_obj()
+        # from badger.web_youtube.routes import get_authorized_yt_obj
+        from badger.data_handler.youtube_auth_handler import YouTube_Auth_Handler
+        youtube = YouTube_Auth_Handler.get_authorized_client()
 
         # https://developers.google.com/youtube/v3/docs/videos#resource-representation
-        request = youtube.videos().list(
+        request = youtube.videos.list(
             part="snippet,contentDetails,status,statistics",
-            id=self.yt_id
+            video_id=self.yt_id,
+            return_json=True
         )
-        response = request.execute()
+        # response = request.execute()
+        response = request 
+
 
         # print("-"*20)
+        # print(type(response))
         # print(response)
+        # print(vars(response))
+        # print("-"*20)
+        # print(dir(response))
         # print("-"*20)
 
         # TODO catch problems
