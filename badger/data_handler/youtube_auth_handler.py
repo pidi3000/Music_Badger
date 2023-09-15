@@ -7,7 +7,7 @@ import flask
 from flask import current_app
 
 import pyyoutube
-from pyyoutube import Client, AccessToken
+from pyyoutube import Client, AccessToken, PyYouTubeException
 
 from badger.error import BadgerYTUserNotAuthorized
 
@@ -153,7 +153,11 @@ class YouTube_Auth_Handler:
         client.DEFAULT_REDIRECT_URI = default_redirect if redirect_uri is None else redirect_uri
 
         # Scope
-        # client.DEFAULT_SCOPE  = flask.url_for('.oauth2callback', _external=True)
+        client.DEFAULT_SCOPE = [
+            'https://www.googleapis.com/auth/youtube.readonly'
+        ]
+        
+        client.DEFAULT_STATE = None
 
         return client
 
@@ -171,6 +175,10 @@ class YouTube_Auth_Handler:
         )
 
         flask.session[cls.SESSION_NAME_YT_AUTH_STATE] = state
+
+        print()
+        print("DEBUG STATE: ", state)
+        print()
 
         return authorize_url
 
@@ -211,7 +219,11 @@ class YouTube_Auth_Handler:
 
             cls.delete_access_token()
 
-            status = client.revoke_access_token(token=token.access_token)
+            try:
+                status = client.revoke_access_token(token=token.access_token)
+            except PyYouTubeException as e:
+                print(e)
+                status = False
 
             return status
 
