@@ -6,7 +6,8 @@ if TYPE_CHECKING:
 import re
 import json
 
-from badger.error import BadgerYTUserNotAuthorized
+from badger.error import BadgerYTUserNotAuthorized, BadgerEntryNotFound
+from pyyoutube import Client, PyYouTubeException
 
 YT_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -29,22 +30,23 @@ class YouTube_Data_Handler:
         if meta_data is not None:
             print("DEBUG YT DATA: ", "loading from DB")
             self.yt_data_raw = json.loads(meta_data.yt_data_raw)
-            # return
+            return
 
         print("DEBUG YT DATA: ", "loading from YT")
         # from badger.web_youtube.routes import get_authorized_yt_obj
         from badger.data_handler.youtube_auth_handler import YouTube_Auth_Handler
-        youtube = YouTube_Auth_Handler.get_authorized_client()
+        youtube: Client = YouTube_Auth_Handler.get_authorized_client()
 
         # https://developers.google.com/youtube/v3/docs/videos#resource-representation
-        request = youtube.videos.list(
-            part="snippet,contentDetails,status,statistics",
-            video_id=self.yt_id,
-            return_json=True
-        )
-        # response = request.execute()
-        response = request 
 
+        try:
+            response = youtube.videos.list(
+                part="snippet,contentDetails,status,statistics",
+                video_id=self.yt_id,
+                return_json=True
+            )
+        except PyYouTubeException:
+            raise
 
         # print("-"*20)
         # print(type(response))
@@ -60,6 +62,15 @@ class YouTube_Data_Handler:
 
         with open("temp/yt_data_raw.json", "w") as f:
             json.dump(response, f, indent=4)
+
+        print()
+        print("DEBG YT DATA: num items:", len(response["items"]))
+        print()
+
+        if len(response["items"]) < 1:
+            print("raise error")
+            raise BadgerEntryNotFound(
+                f"No YouTube video found for id: '{self.yt_id}'")
 
         try:
             response["items"][0]["snippet"]["title"]
