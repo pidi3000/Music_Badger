@@ -1,6 +1,7 @@
-from flask_sqlalchemy import SQLAlchemy
 
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
+from flask_migrate import Migrate
 
 import json
 # from .help_functions import MyJsonEncoder
@@ -9,6 +10,8 @@ from datetime import datetime
 
 
 db = SQLAlchemy()
+migrate = Migrate()
+
 
 
 class MyJsonEncoder(JSONEncoder):

@@ -7,6 +7,7 @@ import os
 import flask
 from flask import Flask, render_template, Response, url_for, redirect, request
 from flask_session import Session
+from flask_migrate import Migrate
 
 def _register_all_blueprints(app: Flask):
 
@@ -76,13 +77,14 @@ def _register_base_routes(app: Flask):
 
 
 def _init_db(app: Flask):
-    from badger.extension import db
+    from badger.extension import db, migrate
 
     db.init_app(app)
+    migrate.init_app(app, db)
 
     from badger import db_models
-    with app.app_context():
-        db.create_all()
+    # with app.app_context():
+    #     db.create_all()
 
 def _init_session(app: Flask):
     Session(app)

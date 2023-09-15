@@ -9,8 +9,7 @@ APP_VERSION = "0.1.0"
 # TODO add Publisher pages
 # TODO export test song entrys from my music playlist for unittest
 
-
-if __name__ == '__main__':
+def create_app() :
     import badger
 
     from data.config import Config
@@ -18,6 +17,11 @@ if __name__ == '__main__':
 
     # app.secret_key = 'REPLACE ME - this value is here as a placeholder.'
     app = badger.create_app(config=config)
+
+    return app
+
+if __name__ == '__main__':
+    app = create_app()
 
     print(app.url_map)
 
