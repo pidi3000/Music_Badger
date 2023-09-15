@@ -14,4 +14,7 @@ def init(app: Flask | Blueprint):
     from . import artist as api_routes
     api_routes.init(blueprint)
 
+    from . import yt_auth as api_routes
+    api_routes.init(blueprint)
+
     app.register_blueprint(blueprint)

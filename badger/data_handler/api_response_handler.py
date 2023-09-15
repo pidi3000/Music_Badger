@@ -27,17 +27,17 @@ def badger_Response(_func=None, *, debug: bool = False):
         def handle_response(*args, **kwargs):
             return_items = []
             errors = []
+            status_code = None  # http status code
 
             try:
                 item = func(*args, **kwargs)
-                status_code = None  # http status code
 
                 if isinstance(item, tuple):
                     status_code = item[1]
                     item = item[0]
                     
-                if item is None:
-                    raise BadgerEntryNotFound("No matching entry found")
+                # if item is None:
+                #     raise BadgerEntryNotFound("No matching entry found")
 
                 if isinstance(item, list):
                     return_items.extend(item)
@@ -149,14 +149,14 @@ class API_Response_Handler():
             # print("DEBUG CONVERT: ", type(data))
             # print()
 
-            if isinstance(data, dict):
+            if isinstance(data, dict) or isinstance(data, str):
                 item = data
             elif isinstance(data, MyJsonConvertable):
                 item = data.to_dict()
                 # item["__class__"] = data.__class__.__name__
             else:
                 raise TypeError(
-                    f"Must be of type MyJsonConvertable or dict, got: {type(data)}")
+                    f"Must be of type MyJsonConvertable, dict or str, got: {type(data)}")
 
             list.append(item)
             return list

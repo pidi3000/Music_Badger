@@ -72,15 +72,20 @@ class BadgerBaseException(Exception, MyJsonConvertable):
 
 
 class BadgerMisingParameter(BadgerBaseException):
-    def __init__(self, message: str = "One of the requiered parameters is missing") -> None:
-        super().__init__(message, error_type="MissingParameter", status_code=400)
+    def __init__(self, message: str = "One of the requiered parameters is missing", status_code=400) -> None:
+        super().__init__(message, error_type="MissingParameter", status_code=status_code)
 
 
 class BadgerYTUserNotAuthorized(BadgerBaseException):
-    def __init__(self, message: str = "Service not authorized on users YouTube Account") -> None:
-        super().__init__(message, error_type="YTUserNotAuthorized", status_code=403)
+    def __init__(self, message: str = "Service not authorized on users YouTube Account", status_code=403) -> None:
+        super().__init__(message, error_type="YTUserNotAuthorized", status_code=status_code)
 
 
 class BadgerEntryNotFound(BadgerBaseException):
-    def __init__(self, message: str = "Requested resource could not be found") -> None:
-        super().__init__(message, error_type="EntryNotFound", status_code=404)
+    def __init__(self, message: str = "Requested resource could not be found", status_code=404) -> None:
+        super().__init__(message, error_type="EntryNotFound", status_code=status_code)
+
+
+class BadgerUnsupportedMediaType(BadgerBaseException):
+    def __init__(self, message: str = "The media type sent is not supported", status_code=415) -> None:
+        super().__init__(message, error_type="UnsupportedMediaType", status_code=status_code)
