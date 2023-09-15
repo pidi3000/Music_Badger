@@ -85,10 +85,10 @@ class Song_Meta_Data(_Base_Mixin, db.Model):
 
     @classmethod
     def create(cls, yt_id: str) -> Song_Meta_Data:
-        """
-        Adds song meta data to collection
+        """Adds song meta data to collection
 
-        Also creates the publisher if needed
+        Automatically retrieves YouTube data
+        and creates the Publisher if needed
 
         Parameters
         ----------            
@@ -121,6 +121,12 @@ class Song_Meta_Data(_Base_Mixin, db.Model):
 
         yt_data_handler = YouTube_Data_Handler(yt_id=yt_id)
 
+        yt_data_raw = json.dumps(
+            yt_data_handler.yt_data_raw,
+            ensure_ascii=False,
+            indent=2
+        )
+
         yt_title = yt_data_handler.get_video_title()
         yt_description = yt_data_handler.get_video_description()
         date_upload = yt_data_handler.get_video_published_date()
@@ -134,8 +140,7 @@ class Song_Meta_Data(_Base_Mixin, db.Model):
             yt_id=yt_id,
             yt_title=yt_title,
             yt_description=yt_description,
-            yt_data_raw=json.dumps(
-                yt_data_handler.yt_data_raw, ensure_ascii=False, indent=2),
+            yt_data_raw=yt_data_raw,
             date_upload=date_upload,
             id_publisher=publisher.id
         )
