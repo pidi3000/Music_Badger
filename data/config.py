@@ -21,6 +21,8 @@ class Config:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    SESSION_TYPE = 'filesystem'
+
     # DEFAULT_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
     # MUSIC_BADGER = MUSIC_BADGER_CONFIG()

@@ -4,8 +4,9 @@ App factory init
 
 import os
 
-from flask import Flask, render_template, Response, url_for, redirect
-
+import flask
+from flask import Flask, render_template, Response, url_for, redirect, request
+from flask_session import Session
 
 def _register_all_blueprints(app: Flask):
 
@@ -38,6 +39,10 @@ def _register_base_routes(app: Flask):
     def index():
         return redirect(url_for('song.index'))
 
+    @app.route('/yt/oauth2callback')
+    def adasdasd():
+        return request.url
+
     @app.route("/style/<stylesheetName>.css")
     def returnStyle(stylesheetName):
 
@@ -62,6 +67,10 @@ def _register_base_routes(app: Flask):
     def test_page():
         # from badger.data_handler.youtube_data_handler import get_video_data_raw
         # return get_video_data_raw("LP_qEm1BKiw")
+        # flask.session["test_stuff"] = "123456789"
+        print(flask.session.get("test_stuff"))
+        flask.session.pop("test_stuff")
+        print(flask.session.get("test_stuff"))
 
         return '<h1>Testing the Flask Application Factory Pattern</h1>'
 
@@ -75,10 +84,17 @@ def _init_db(app: Flask):
     with app.app_context():
         db.create_all()
 
+def _init_session(app: Flask):
+    Session(app)
+    # sess = Session()
+    # sess.init_app(app)
+
 
 def init_with_app(app: Flask):
     # print(Config.SQLALCHEMY_DATABASE_URI)
+    _init_session(app)
     _init_db(app)
+
     _register_all_blueprints(app)
     _register_base_routes(app)
 
