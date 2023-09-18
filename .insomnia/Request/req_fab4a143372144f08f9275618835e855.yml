@@ -1,7 +1,7 @@
 _id: req_fab4a143372144f08f9275618835e855
 type: Request
 parentId: fld_c9b89e2a682d486991b65982d3c254c5
-modified: 1694746290134
+modified: 1695001723409
 created: 1694725166574
 url: "{{ _.base_url }}/song"
 name: Add new Song
@@ -11,12 +11,7 @@ body:
   mimeType: application/json
   text: |-
     {
-      "yt_id": "string",
-      "artists": [
-        "string"
-      ],
-      "title": "string",
-      "extras": "string"
+      "yt_id": "https://www.youtube.com/watch?v=pWqAMhY3kU0"
     }
 parameters: []
 headers:

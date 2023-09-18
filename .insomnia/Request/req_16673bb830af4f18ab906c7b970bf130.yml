@@ -1,7 +1,7 @@
 _id: req_16673bb830af4f18ab906c7b970bf130
 type: Request
 parentId: fld_c9b89e2a682d486991b65982d3c254c5
-modified: 1694746292212
+modified: 1695003866738
 created: 1694725166568
 url: "{{ _.base_url }}/song"
 name: Get songs
@@ -10,14 +10,22 @@ method: GET
 body: {}
 parameters:
   - name: yt_id
-    disabled: false
+    disabled: true
     value: string
+    id: pair_fb576bc3400944bfadb2130a30861e73
   - name: id
-    disabled: false
-    value: "0"
+    disabled: true
+    value: "3"
+    id: pair_9dc2de430c3e4617a7f55f5bd8c6d5ce
   - name: all
     disabled: false
-    value: "null"
+    value: "1"
+    id: pair_61ceae289cbd4a2c90f3885d73d84275
+  - id: pair_1f0a33d464cb49c9b01736789c14e0ff
+    name: page_id
+    value: "1"
+    description: ""
+    disabled: false
 headers:
   - id: pair_c17a3ab6c24a4899a3957c9c4120b0e7
     name: User-Agent
