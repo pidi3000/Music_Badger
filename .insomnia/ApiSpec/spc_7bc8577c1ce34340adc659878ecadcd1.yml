@@ -1,7 +1,7 @@
 _id: spc_7bc8577c1ce34340adc659878ecadcd1
 type: ApiSpec
 parentId: wrk_9a7e101ed6074e1d86ec1cbe13315821
-modified: 1694737906255
+modified: 1695000465440
 created: 1694462417687
 fileName: my-spec.yaml
 contents: >
@@ -76,8 +76,6 @@ contents: >
         operationId: getSong
 
         parameters:
-          - $ref: "#/components/parameters/yt_id"
-          - $ref: "#/components/parameters/db_id"
           - name: all
             in: query
             description: retrive all songs
@@ -88,7 +86,12 @@ contents: >
               enum:
                 - "false"
                 - "true"
-
+                
+          - $ref: "#/components/parameters/db_id"
+          - $ref: "#/components/parameters/yt_id"
+          
+          - $ref: "#/components/parameters/page_id"
+          
         responses:
           "200":
             $ref: "#/components/responses/200-song"
@@ -187,6 +190,7 @@ contents: >
 
         parameters:
           - $ref: "#/components/parameters/db_id"
+          - $ref: "#/components/parameters/page_id"
 
         responses:
           "200":
@@ -205,6 +209,9 @@ contents: >
         description: "Get a list of ALL Artists"
 
         operationId: getArtistList
+
+        parameters:
+          - $ref: "#/components/parameters/page_id"
 
         responses:
           "200":
@@ -309,6 +316,16 @@ contents: >
         schema:
           type: integer
           format: int64
+          
+
+      page_id:
+        name: page_id
+        in: query
+        description: page number
+        required: false
+        schema:
+          type: integer
+          format: int64
 
     #########################
     requestBodies:
@@ -401,10 +418,16 @@ contents: >
                   type: array
                   items:
                     $ref: "#/components/schemas/Song"
+                    
                 warnings:
                   type: array
                   items:
                     $ref: "#/components/schemas/Warning"
+                    
+                pageInfo:
+                  $ref: "#/components/schemas/PageInfo"
+                    
+                    
       200-song-info:
         description: return Song list
         content:
@@ -463,27 +486,13 @@ contents: >
                   type: array
                   items:
                     $ref: "#/components/schemas/Warning"
+                    
+                pageInfo:
+                  $ref: "#/components/schemas/PageInfo"
 
       ##################################################
       # YouTUbe stuff
       ##################################################
-      200-yt:
-        description: return artist list
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                items:
-                  #                 $ref: "#/components/schemas/SongList"
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/Artist"
-                warnings:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/Warning"
-
       404-yt:
         description: No credentials exist for user to revoke
         content:
@@ -498,6 +507,8 @@ contents: >
                     example:
                       type: "NoCredentialsSaved"
                       message: "No credentials found to revoke"
+                      
+                      
     ###########################################################################
     schemas:
       ##################################################
@@ -512,6 +523,10 @@ contents: >
           yt_id:
             type: string
             description: YouTube video ID
+          date_added:
+            type: string
+            format: date-time
+            description: Date when the user added the song
           name:
             type: string
             description: song name
@@ -606,6 +621,37 @@ contents: >
             type: string
             description: Warning message
 
+
+      ##################################################
+      # Warnings / Errors
+      ##################################################
+      PageInfo:
+        type: object
+        properties:
+          totalResults:
+            type: integer
+            description: Num results on all pages
+            
+          resultsPerPage:
+            type: integer
+            description: Max results per page
+  #           format: int64
+            
+          totalPages:
+            type: integer
+            description: Num total pages
+            
+          nextPageID:
+            type: integer
+            description: ID of the next page.
+              can be missing or `null`
+            
+          prevPageID:
+            type: integer
+            description: ID of the previous page.
+              can be missing or `null`
+            
+            
       ##################################################
       ##################################################
       SongAdd:

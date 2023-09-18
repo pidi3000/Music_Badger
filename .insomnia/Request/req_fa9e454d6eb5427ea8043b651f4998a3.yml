@@ -1,0 +1,24 @@
+_id: req_fa9e454d6eb5427ea8043b651f4998a3
+type: Request
+parentId: fld_882e2a5d64164bf882e963bb004d1b7f
+modified: 1694794079350
+created: 1694793647170
+url: "{{ _.base_url }}/yt/clear"
+name: Clear
+description: ""
+method: DELETE
+body: {}
+parameters: []
+headers:
+  - name: User-Agent
+    value: "{{ _['User-Agent'] }}"
+    id: pair_9000d16630f041009d4b7fc8c256c3e4
+authentication: {}
+metaSortKey: -1694793647170
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

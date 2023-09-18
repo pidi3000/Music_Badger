@@ -1,7 +1,7 @@
 _id: req_e0c646c96aa94813af30f0013e9b4d6a
 type: Request
 parentId: fld_882e2a5d64164bf882e963bb004d1b7f
-modified: 1694746276188
+modified: 1695003293878
 created: 1694725166607
 url: "{{ _.base_url }}/yt/oauth2callback"
 name: Finish YouTube OAuth Flow
@@ -11,7 +11,7 @@ body:
   mimeType: application/json
   text: >-
     {
-      "authorization_response": "http://localhost:5000/yt/oauth2callback?state=Python-YouTube&code=4/0Adeu5BUQGR93-i8aZ3JO1yyamCEudRq-ZJlIu_juIn-onZ37J1DANzobEbgAla0Z9jdhxA&scope=profile%20https://www.googleapis.com/auth/youtube%20https://www.googleapis.com/auth/userinfo.profile"
+      "authorization_response": "http://localhost:5000/yt/oauth2callback?state=IuTMUu6jYyU5uPEIp0IfhPZem52ZXr&code=4/0AfJohXmKBy0bb_GYQS0bPpOAHa9s6YJEH2_SDlNg0zvHefy_nvT09ZCdyVvG1mxygsntDA&scope=https://www.googleapis.com/auth/youtube.readonly"
     }
 parameters: []
 headers:
