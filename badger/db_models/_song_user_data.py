@@ -10,7 +10,10 @@ from badger.db_models._artist_song import _artist_song
 from badger.data_handler.youtube_data_handler import YouTube_Data_Handler
 
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql import func
 from sqlalchemy.orm import Mapped
+
+from flask_sqlalchemy.pagination import Pagination
 
 
 class Song_User_Data(_Base_Mixin, db.Model):
@@ -35,6 +38,7 @@ class Song_User_Data(_Base_Mixin, db.Model):
     ################################
     title: str = db.Column(db.String(200), nullable=False)
     extras: str = db.Column(db.String(1000), nullable=True)
+    date_added = db.Column(db.DateTime, default=func.now())
 
     def __repr__(self):
         return f'<Song_User_Data {self.title}>'
@@ -181,13 +185,13 @@ class Song_User_Data(_Base_Mixin, db.Model):
              user_extras: str | list[str] | None = None
              ) -> Song_User_Data:
 
-        if user_song_title is not None: 
-            self.title = user_song_title 
+        if user_song_title is not None:
+            self.title = user_song_title
 
-        if user_extras is not None: 
+        if user_extras is not None:
             self.extras = user_extras
 
-        if user_artist_list is not None and len(user_artist_list) > 0: 
+        if user_artist_list is not None and len(user_artist_list) > 0:
             # print("DEBUG create:", user_artist_list)
             self.artist_list.clear()
             self.artist_list.extend(user_artist_list)

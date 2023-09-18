@@ -356,6 +356,7 @@ class Song(MyJsonConvertable):
         {
             "id": 0,
             "yt_id": "",
+            "date_added": "",
             "title": "",
             "extras": "",
             "artists": [ # list of all artists
@@ -397,6 +398,8 @@ class Song(MyJsonConvertable):
         song_dict = {
             "id": self.user_data.id,
             "yt_id": self.meta_data.yt_id,
+            "date_added": self.user_data.date_added,
+
             "title": self.user_data.title,
             "extras": self.user_data.extras,
             "artists": artists,
