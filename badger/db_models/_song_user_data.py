@@ -154,6 +154,23 @@ class Song_User_Data(_Base_Mixin, db.Model):
         # return meata_data.user_data_list[0] if meata_data is not None and len(meata_data.user_data_list) > 0 else None
         # return cls.query.filter_by(yt_id=yt_id).first()
 
+    @classmethod
+    def get_page(cls, page_num: int = 1, per_page: int = 2) -> Pagination:
+        """Get page entrys from DB
+
+        Parameters
+        ----------
+        page_num
+            the page number to get
+
+        """
+
+        return Song_User_Data.query.order_by(Song_User_Data.date_added.desc()).paginate(
+            page=page_num,
+            per_page=per_page,
+            error_out=False
+        )
+
     ################################################################
     #
     ################################################################

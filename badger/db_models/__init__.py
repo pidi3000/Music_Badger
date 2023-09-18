@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from flask_sqlalchemy import SQLAlchemy
-from flask_sqlalchemy import model
+from flask_sqlalchemy.pagination import Pagination
+from flask_sqlalchemy import SQLAlchemy, model
 
 from badger.extension import db
 from badger.extension import MyJsonConvertable
@@ -22,6 +22,24 @@ class _Base_Mixin(MyJsonConvertable):
     def get_all(cls) -> list[_Base_Mixin | None]:
         """Get all entrys from DB"""
         return cls.query.all()
+
+    @classmethod
+    def get_page(cls, page_num:int = 1, per_page:int = 2) -> Pagination:
+        """Get page entrys from DB
+        
+        Parameters
+        ----------
+        page_num
+            the page number to get
+        
+        """
+        print(page_num)
+
+        return cls.query.paginate(
+            page=page_num, 
+            per_page=per_page,
+            error_out = False
+            )
 
     @classmethod
     def get_first(cls) -> _Base_Mixin | None:

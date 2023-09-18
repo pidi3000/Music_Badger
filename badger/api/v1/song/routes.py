@@ -18,10 +18,11 @@ from badger.data_handler.song_handler import Song
 def index():
     response = None
     status_code = None
+    page_info = None
 
     if request.method == 'GET':
         # response = handle_get_song_path()
-        response = _handle_get_song()
+        response, page_info = _handle_get_song()
 
     if request.method == 'POST':
         # response = handle_add_song_path()
@@ -34,7 +35,7 @@ def index():
         song_data = _get_song_data()
         response = _handle_edit_song(song_data)
 
-    return response, status_code
+    return response, status_code, page_info
 
 
 @api_pages.route('/song/info', methods=["GET"])
@@ -69,15 +70,17 @@ def _handle_get_song():
         request.values.get("all"), bool)
 
     if all:
-        all_songs = Song.get_all()
-        return all_songs
+        # all_songs = Song.get_all()
+        page_id = request.values.get("page_id", type=int)
+        all_songs, page_info = Song.get_page(page_num=page_id)
+        return all_songs, page_info
 
     id = User_Input_Handler.get_as_type_or_none(request.values.get("id"), int)
     yt_id = User_Input_Handler.extract_yt_ID(
         request.values.get("yt_id")) if id is None else None
 
-    new_song = Song.get(id=id, yt_id=yt_id)
-    return new_song
+    song = Song.get(id=id, yt_id=yt_id)
+    return song, None
 
 
 ####################

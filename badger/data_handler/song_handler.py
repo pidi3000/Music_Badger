@@ -3,6 +3,7 @@
 from badger.db_models import Song_Meta_Data, Song_User_Data, Artist, Publisher
 from badger.extension import MyJsonConvertable
 
+from badger.data_handler.api_response_handler import API_Response_Handler
 from badger.data_handler.user_input_handler import User_Input_Handler
 from badger.data_handler.youtube_data_handler import YouTube_Data_Handler
 
@@ -270,6 +271,22 @@ class Song(MyJsonConvertable):
             all_songs.append(Song.get(id=user_song_data.id))
 
         return all_songs
+
+    @classmethod
+    def get_page(cls, page_num:int = 1, per_page:int = 2) -> (list['Song'], API_Response_Handler.API_page_info):
+        """Get paged songs from DB"""
+
+        all_user_songs: list[Song_User_Data] = Song_User_Data.get_page(page_num=page_num, per_page=per_page)
+
+        all_songs: list[Song] = []
+
+        for user_song_data in all_user_songs:
+            all_songs.append(Song.get(id=user_song_data.id))
+
+        
+        page_info = API_Response_Handler.create_page_info(all_user_songs)
+
+        return (all_songs, page_info)
 
     @classmethod
     def get_info(cls, yt_id: str) -> dict:

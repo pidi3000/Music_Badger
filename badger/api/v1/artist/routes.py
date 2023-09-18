@@ -24,5 +24,8 @@ def index():
 @badger_Response
 def list():
     if request.method == 'GET':
-        all_artists = Artist.get_all()
+        # all_artists = Artist.get_all()
+        page_id = request.values.get("page_id", type=int)
+        all_artists = Artist.get_page(page_num=page_id)
+
         return all_artists

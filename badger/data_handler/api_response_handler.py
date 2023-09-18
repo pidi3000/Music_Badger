@@ -1,4 +1,6 @@
 
+from flask_sqlalchemy.pagination import Pagination
+
 from badger.extension import MyJsonConvertable
 from badger.error import *
 
@@ -11,16 +13,33 @@ def badger_Response(_func=None, *, debug: bool = False):
     """Badger response decorator
 
     converts the functions return valuse to the API response structure.\n
-    The decorated function can return a single `item` or a `tuple(item, status_code)`.\n
-    The status_code is used as the HTTP status code, with the default being `200`.\n
-    The returned `item` CAN NOT be a tuple, unless a status_code is returned as well.\n
-    in this case the status_code can be `None`\n
-    For example like this 
-    ```
-        status_code = 300 # or None
-        item = (1, 5, "data")
-        return  (item, status_code)
-    ```
+    The decorated function can return a single `item` or a `tuple`.\n
+
+    The return tuple can have following parameters:\n
+    (`item`, `status_code`, `page_info`)\n
+    These parameters must be set in this order, only following ones can be omitted.\n
+    For example to only set `item` and `page_info` the return tuple must be `(item, None, page_info_instance)`
+    \n
+    `item`
+    ------
+    must be of type:\n
+        `flask_sqlalchemy.pagination.Pagination` or\n
+        `list[MyJsonConvertable | dict | str]` or \n
+        `MyJsonConvertable`, `str`, `dict`\n
+
+    `status_code`
+    -------------
+    status_code must be a `int` or `None` for default.\n
+    is used as the HTTP status code, default is '200'\n
+
+    `page_info`
+    -------------
+    must be of type `API_Response_Handler.API_page_info` or `None`\n
+    use `API_Response_Handler.create_page_info(page: Pagination)` to get `API_page_info` instance
+    if `None` page_info is auto generated from `item`
+
+
+
     """
     def badger_Response_decorator(func):
         @functools.wraps(func)
@@ -28,19 +47,23 @@ def badger_Response(_func=None, *, debug: bool = False):
             return_items = []
             errors = []
             status_code = None  # http status code
+            page_info = None
 
             try:
                 item = func(*args, **kwargs)
 
                 if isinstance(item, tuple):
-                    status_code = item[1]
+                    page_info = item[2] if len(item) >= 3 else None
+                    status_code = item[1] if len(item) >= 2 else None
                     item = item[0]
-                    
+
                 # if item is None:
                 #     raise BadgerEntryNotFound("No matching entry found")
 
                 if isinstance(item, list):
                     return_items.extend(item)
+                elif isinstance(item, Pagination):
+                    return_items = item
                 else:
                     return_items.append(item)
 
@@ -51,7 +74,7 @@ def badger_Response(_func=None, *, debug: bool = False):
                 print("return_items", return_items)
                 print("errors", errors)
 
-            return API_Response_Handler(items=return_items, errors=errors, status_code=status_code).get_response()
+            return API_Response_Handler(items=return_items, errors=errors, status_code=status_code, page_info=page_info).get_response()
 
         return handle_response
 
@@ -62,27 +85,72 @@ def badger_Response(_func=None, *, debug: bool = False):
 
 
 class API_Response_Handler():
-    status_code = 200 # HTTP status code
+
+    class API_page_info():
+        totalResults: int
+        resultsPerPage: int
+
+        totalPages: int
+        curPageID: int = None
+        nextPageID: int = None
+        prevPageID: int = None
+
+        def __init__(self, page: Pagination = None) -> None:
+            if page is not None:
+                self.totalResults = page.total
+                self.resultsPerPage = page.per_page
+                self.totalPages = page.pages
+
+                self.curPageID = page.page
+                self.nextPageID = page.next_num
+                self.prevPageID = min(page.prev_num, self.totalPages) if page.has_prev else None
+
+        def to_json(self) -> dict:
+            json = {
+                "totalResults": self.totalResults,
+                "resultsPerPage": self.resultsPerPage,
+                "totalPages": self.totalPages,
+            }
+
+            if self.curPageID:
+                json["curPageID"] = self.curPageID
+            
+            if self.nextPageID:
+                json["nextPageID"] = self.nextPageID
+
+            if self.prevPageID:
+                json["prevPageID"] = self.prevPageID
+
+            return json
+
+    status_code = 200  # HTTP status code
 
     items = []
+    page_info: API_page_info = None
     # warnings = []
     errors = []
 
     def __init__(self,
-                 items: list[MyJsonConvertable | dict] = None,
+                 items: list[MyJsonConvertable | dict] | Pagination = None,
                  errors: list[BadgerBaseException] = None,
-                 status_code: int = None) -> None:
+                 status_code: int = None,
+                 page_info: API_page_info = None
+                 ) -> None:
+
         self.items = items
         self.errors = errors
-    
+
         if status_code is not None:
             self.status_code = status_code
+
+        if page_info is not None:
+            self.page_info = page_info
 
     def get_response(self) -> (dict, int):
         """Returns a response dict and status code
         """
         response_obj = {
-            # "data": None,
+            # "items": None,
             # "warnings": None, # TODO
             # "errors": None,
         }
@@ -91,11 +159,17 @@ class API_Response_Handler():
 
         errors = self._handle_data(data=self.errors)
 
-        if errors is None:
-            items = self._handle_data(data=self.items)
-            response_obj["items"] = items
+        if errors is None or len(errors) < 1:
+            self._items = self._handle_data(data=self.items)
+            response_obj["items"] = self._items
 
+            # handle page_info
+            page_info = self._handle_page_info()
+            response_obj["pageInfo"] = page_info.to_json()
+
+            print("DEBUG page num results: ", len(response_obj["items"]))
         else:
+            print("DEBUG error: ", self.errors)
             response_obj["errors"] = errors
             self.status_code = self._get_status_code(self.errors)
 
@@ -123,8 +197,10 @@ class API_Response_Handler():
 
         return response_obj
 
-    @classmethod
-    def _handle_data(cls, data: list[MyJsonConvertable | dict]) -> list | None:
+    ####################################################################################################
+    # Return items handler
+    ####################################################################################################
+    def _handle_data(self, data: list[MyJsonConvertable | dict] | Pagination) -> list | None:
         """Convert data to list of dicts
         """
 
@@ -136,41 +212,17 @@ class API_Response_Handler():
         if data is None:
             return None
 
-        def convert_add(list, data: MyJsonConvertable | dict) -> list:
-            """
-            conver item and add to list
-            creates list if non exists
-            """
-            if list is None:
-                list = []
-
-            # print()
-            # print("DEBUG CONVERT: ", data)
-            # print("DEBUG CONVERT: ", type(data))
-            # print()
-
-            if isinstance(data, dict) or isinstance(data, str):
-                item = data
-            elif isinstance(data, MyJsonConvertable):
-                item = data.to_dict()
-                # item["__class__"] = data.__class__.__name__
-            else:
-                raise TypeError(
-                    f"Must be of type MyJsonConvertable, dict or str, got: {type(data)}")
-
-            list.append(item)
-            return list
-
         data_list = None
+
         if isinstance(data, list):
-            if len(data) > 0:
-                for d in data:
-                    if d is not None:
-                        data_list = convert_add(data_list, d)
+            data_list = self._handle_items_list(items=data)
+
+        elif isinstance(data, Pagination):
+            data_list = self._handle_page(page=data)
 
         elif isinstance(data, MyJsonConvertable):
             raise NotImplementedError("no longer works this way")
-            data_list = convert_add(data_list, data)
+            data_list = _handel_itme(data_list, data)
 
         else:
             raise TypeError("Unsupported data type")
@@ -178,8 +230,69 @@ class API_Response_Handler():
         return data_list
         # return data_list if len(data_list) > 0 else None
 
-    @classmethod
-    def _get_status_code(cls, errors: list[BadgerBaseException]):
+    def _handle_items_list(self, items: list[MyJsonConvertable | dict]):
+        item_list = []
+        for item in items:
+            item_list = self._handel_item(item_list, item)
+
+        return item_list
+
+    def _handle_page(self, page: Pagination) -> list | None:
+        self.page_info = self.API_page_info(page=page)
+
+        item_list = []
+        for item in page.items:
+            item_list = self._handel_item(item_list, item)
+
+        return item_list
+
+    def _handel_item(self, list, data: MyJsonConvertable | dict) -> list:
+        """
+        convert item and add to list
+        creates list if non exists
+        """
+        if list is None:
+            list = []
+
+        # print()
+        # print("DEBUG CONVERT: ", data)
+        # print("DEBUG CONVERT: ", type(data))
+        # print("DEBUG CONVERT: ", isinstance(data, Pagination))
+        # print("DEBUG CONVERT: ", isinstance(data, QueryPagination))
+        # print()
+
+        if data is None:
+            return list
+
+        if isinstance(data, dict) or isinstance(data, str):
+            item = data
+
+        elif isinstance(data, MyJsonConvertable):
+            item = data.to_dict()
+            # item["__class__"] = data.__class__.__name__
+
+        else:
+            raise TypeError(
+                f"Must be of type MyJsonConvertable, dict or str, got: {type(data)}")
+
+        list.append(item)
+        return list
+
+    ##################################################
+    ##################################################
+    def _handle_page_info(self):
+        page_info = self.page_info
+
+        if page_info is None:
+            page_info = self.API_page_info()
+            num_item = len(self._items)
+            page_info.totalPages = 1
+            page_info.resultsPerPage = num_item
+            page_info.totalResults = num_item
+
+        return page_info
+
+    def _get_status_code(self, errors: list[BadgerBaseException]):
         status_code: int = 500
 
         if isinstance(errors, list):
@@ -197,3 +310,8 @@ class API_Response_Handler():
             raise TypeError("Unsupported data type")
 
         return status_code
+
+    @classmethod
+    def create_page_info(cls, page: Pagination) -> API_page_info:
+        page_info = cls.API_page_info(page=page)
+        return page_info
