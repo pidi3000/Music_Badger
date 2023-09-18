@@ -35,7 +35,7 @@ class MyJsonEncoder(JSONEncoder):
         elif isinstance(item, datetime):
             item: datetime
             # return item.strftime(Config.DEFAULT_DATETIME_FORMAT)
-            return str(item)
+            return item.isoformat()
 
         else:
             return str(item)

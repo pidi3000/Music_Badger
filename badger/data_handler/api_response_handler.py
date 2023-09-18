@@ -268,7 +268,8 @@ class API_Response_Handler():
             item = data
 
         elif isinstance(data, MyJsonConvertable):
-            item = data.to_dict()
+            # item = data.to_dict()
+            item = data.to_json()
             # item["__class__"] = data.__class__.__name__
 
         else:
