@@ -24,22 +24,27 @@ class _Base_Mixin(MyJsonConvertable):
         return cls.query.all()
 
     @classmethod
-    def get_page(cls, page_num:int = 1, per_page:int = 2) -> Pagination:
+    def get_page(cls, page_num: int = 1, per_page: int = 2) -> Pagination:
+        # 
+        # docs fucntion parameters: https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
+        # docs page properties: https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/api/#flask_sqlalchemy.pagination.Pagination
+        # docs how to: https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/pagination/
+        # https://www.digitalocean.com/community/tutorials/how-to-query-tables-and-paginate-data-in-flask-sqlalchemy#step-4-ordering-limiting-and-counting-results
         """Get page entrys from DB
-        
+
         Parameters
         ----------
         page_num
             the page number to get
-        
+
         """
         print(page_num)
 
         return cls.query.paginate(
-            page=page_num, 
+            page=page_num,
             per_page=per_page,
-            error_out = False
-            )
+            error_out=False
+        )
 
     @classmethod
     def get_first(cls) -> _Base_Mixin | None:
@@ -90,13 +95,12 @@ class _Base_Mixin(MyJsonConvertable):
 
 
 # def _import_models():
-from ._files import Audio_File
-from ._files import Image_File
-from ._artist import Artist
-from ._publisher import Publisher
-from ._song_user_data import Song_User_Data
 from ._song_meta_data import Song_Meta_Data
-
+from ._song_user_data import Song_User_Data
+from ._publisher import Publisher
+from ._artist import Artist
+from ._files import Image_File
+from ._files import Audio_File
 
 # _import_models()
 

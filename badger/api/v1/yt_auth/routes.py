@@ -92,7 +92,8 @@ def test():
     status_code = 200
 
     response = {
-        "yt": YouTube_Auth_Handler.check_yt_authorized(),
+        "yt_authorized": YouTube_Auth_Handler.check_yt_authorized(),
+        "expired": YouTube_Auth_Handler.check_access_token_expired(),
         "session": session.get("YT_AccessToken")
     }
 

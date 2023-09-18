@@ -2,6 +2,7 @@
 
 import json
 import os
+from datetime import datetime
 
 import flask
 from flask import current_app
@@ -61,7 +62,7 @@ class YouTube_Auth_Handler:
     @classmethod
     def get_access_token(cls) -> AccessToken:
         # can raise KeyError, must firts run check_yt_authorized to verify
-        cls.assert_yt_authorized()
+        # cls.assert_yt_authorized()
         return AccessToken.from_json(flask.session.get(cls.SESSION_NAME_ACCESSTOKEN))
 
     @classmethod
@@ -75,6 +76,14 @@ class YouTube_Auth_Handler:
         # flask.session[cls.SESSION_NAME_ACCESSTOKEN] = None
         flask.session.pop(cls.SESSION_NAME_ACCESSTOKEN)
         # del flask.session[cls.SESSION_NAME_ACCESSTOKEN]
+
+    @classmethod
+    def check_access_token_expired(cls):
+        access_token = cls.get_access_token()
+        expire_date = datetime.fromtimestamp(access_token.expires_at)
+        time_now = datetime.now()
+
+        return expire_date < time_now
 
     ####################################################################################################
     # Authorization functions
@@ -97,8 +106,8 @@ class YouTube_Auth_Handler:
 
         """
 
-        FileNotFoundError
-        if cls.SESSION_NAME_ACCESSTOKEN not in flask.session:
+        # FileNotFoundError
+        if cls.SESSION_NAME_ACCESSTOKEN not in flask.session or cls.check_access_token_expired():
             raise BadgerYTUserNotAuthorized()
 
         if not cls.check_secret_file_exists():
@@ -109,7 +118,7 @@ class YouTube_Auth_Handler:
         """
         Check if the users YT account has authorized the service
         """
-        authorized = cls.SESSION_NAME_ACCESSTOKEN in flask.session and cls.check_secret_file_exists()
+        authorized = cls.SESSION_NAME_ACCESSTOKEN in flask.session and cls.check_secret_file_exists() and not cls.check_access_token_expired()
         return authorized
 
     @classmethod
@@ -156,7 +165,7 @@ class YouTube_Auth_Handler:
         client.DEFAULT_SCOPE = [
             'https://www.googleapis.com/auth/youtube.readonly'
         ]
-        
+
         client.DEFAULT_STATE = None
 
         return client
@@ -172,6 +181,7 @@ class YouTube_Auth_Handler:
 
         authorize_url, state = client.get_authorize_url(
             # access_type=`online` or `offline`
+            access_type="offline"
         )
 
         flask.session[cls.SESSION_NAME_YT_AUTH_STATE] = state
