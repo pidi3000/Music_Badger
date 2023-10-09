@@ -33,9 +33,10 @@ class YouTube_Data_Handler:
             return
 
         print("DEBUG YT DATA: ", "loading from YT")
-        # from badger.web_youtube.routes import get_authorized_yt_obj
+
         from badger.data_handler.youtube_auth_handler import YouTube_Auth_Handler
-        youtube: Client = YouTube_Auth_Handler.get_authorized_client()
+        # youtube: Client = YouTube_Auth_Handler.get_authorized_USER_client()
+        youtube: Client = YouTube_Auth_Handler.get_authorized_API_client()
 
         # https://developers.google.com/youtube/v3/docs/videos#resource-representation
 

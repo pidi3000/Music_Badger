@@ -74,10 +74,16 @@ class Flask_Config(Badger_Config_Section):
 
 class Badger_Config(Badger_Config_Section):
 
+    YT_API_KEY: str
     CLIENT_SECRETS_FILE: Path
+    
+    ENTRYS_PER_PAGE: int
 
     def setup(self):
+        self.YT_API_KEY = ""
         self.CLIENT_SECRETS_FILE: Path = Path("client_secret_youtube.json")  # relative to data dir
+        
+        self.ENTRYS_PER_PAGE = 5
 
     def post_process(self):
         # TODO make sure these are safe

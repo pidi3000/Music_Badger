@@ -2,15 +2,16 @@
 
 import json
 import os
+from pathlib import Path
 from datetime import datetime
 
 import flask
-from flask import current_app
 
 import pyyoutube
 from pyyoutube import Client, AccessToken, PyYouTubeException
 
-from badger.error import BadgerYTUserNotAuthorized
+from badger.error import BadgerYTUserNotAuthorized, Badger_YT_API_key_not_found
+from badger.config import app_config
 
 # CACHING DATA, dict with 'client_id' and 'client_secret'
 _client_secret_data: dict = None
@@ -27,12 +28,12 @@ class YouTube_Auth_Handler:
     ####################################################################################################
 
     @classmethod
-    def get_client_secrets_file_path(cls) -> str:
-        return current_app.config["MUSIC_BADGER"]["CLIENT_SECRETS_FILE"]
+    def get_client_secrets_file_path(cls) -> Path:
+        return app_config.badger.CLIENT_SECRETS_FILE
 
     @classmethod
     def check_secret_file_exists(cls):
-        return os.path.isfile(cls.get_client_secrets_file_path())
+        return cls.get_client_secrets_file_path().exists()
 
     @classmethod
     def get_client_secret_data(cls):
@@ -55,6 +56,19 @@ class YouTube_Auth_Handler:
 
         return _client_secret_data
 
+    ####################################################################################################
+    # API key functions
+    ####################################################################################################
+
+    @classmethod
+    def get_API_key(cls, check_set: bool = True):
+        YT_API_KEY = app_config.badger.YT_API_KEY
+
+        if check_set and (YT_API_KEY is None or len(YT_API_KEY.strip()) < 10):
+            raise Badger_YT_API_key_not_found()
+
+        return app_config.badger.YT_API_KEY
+
     ##################################################
     # Credential functions
     ##################################################
@@ -74,16 +88,23 @@ class YouTube_Auth_Handler:
     @classmethod
     def delete_access_token(cls):
         # flask.session[cls.SESSION_NAME_ACCESSTOKEN] = None
-        flask.session.pop(cls.SESSION_NAME_ACCESSTOKEN)
+        try:
+            flask.session.pop(cls.SESSION_NAME_ACCESSTOKEN)
+        except KeyError:
+            pass
+        
         # del flask.session[cls.SESSION_NAME_ACCESSTOKEN]
 
     @classmethod
     def check_access_token_expired(cls):
-        access_token = cls.get_access_token()
-        expire_date = datetime.fromtimestamp(access_token.expires_at)
-        time_now = datetime.now()
+        if cls.check_yt_authorized():
+            access_token = cls.get_access_token()
+            expire_date = datetime.fromtimestamp(access_token.expires_at)
+            time_now = datetime.now()
 
-        return expire_date < time_now
+            return expire_date < time_now   
+        
+        return None
 
     ####################################################################################################
     # Authorization functions
@@ -118,11 +139,12 @@ class YouTube_Auth_Handler:
         """
         Check if the users YT account has authorized the service
         """
-        authorized = cls.SESSION_NAME_ACCESSTOKEN in flask.session and cls.check_secret_file_exists() and not cls.check_access_token_expired()
+        authorized = cls.SESSION_NAME_ACCESSTOKEN in flask.session and cls.check_secret_file_exists(
+        ) and not cls.check_access_token_expired()
         return authorized
 
     @classmethod
-    def get_authorized_client(cls) -> pyyoutube.Client:
+    def get_authorized_USER_client(cls) -> pyyoutube.Client:
         cls.assert_yt_authorized()
 
         access_token = cls.get_access_token()
@@ -133,6 +155,16 @@ class YouTube_Auth_Handler:
             refresh_token=access_token.refresh_token,
             client_id=client_secrets["client_id"],
             client_secret=client_secrets["client_secret"]
+        )
+
+        return client
+
+    @classmethod
+    def get_authorized_API_client(cls) -> pyyoutube.Client:
+        api_key = cls.get_API_key()
+
+        client = Client(
+            api_key=api_key
         )
 
         return client
@@ -158,7 +190,7 @@ class YouTube_Auth_Handler:
         # override redirect URI
         # client.DEFAULT_REDIRECT_URI = flask.url_for('.oauth2callback', _external=True)
         # default_redirect = "http://localhost:5000/api/v1/yt/oauth2callback"
-        default_redirect = "http://localhost:5000/yt/oauth2callback"
+        default_redirect = "http://localhost:5100/yt/oauth2callback"
         client.DEFAULT_REDIRECT_URI = default_redirect if redirect_uri is None else redirect_uri
 
         # Scope

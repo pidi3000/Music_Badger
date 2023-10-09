@@ -7,6 +7,8 @@ from badger.data_handler.api_response_handler import API_Response_Handler
 from badger.data_handler.user_input_handler import User_Input_Handler
 from badger.data_handler.youtube_data_handler import YouTube_Data_Handler
 
+from badger.error import BadgerEntryAlreadyExists
+
 _debug = True
 
 
@@ -63,8 +65,10 @@ class Song(MyJsonConvertable):
         ValueError
             If the yt_id is invalid
 
-        LookupError
+        BadgerEntryAlreadyExists
             If a Song with the yt_id already exists\n
+
+        LookupError
             If an Artist with the given id does not exist
 
         TypeError
@@ -81,7 +85,8 @@ class Song(MyJsonConvertable):
             raise ValueError(f"yt_ID invalid: '{yt_id}'")
 
         if Song.check_exists(yt_id):
-            raise LookupError(f"Song with the yt_ID '{yt_id}' already exists")
+            raise BadgerEntryAlreadyExists(
+                message=f"Song with the yt_ID '{yt_id}' already exists")
 
         artist_list = User_Input_Handler.get_artists(artist_data)
         print("DEBUG get:", artist_list)
@@ -273,17 +278,17 @@ class Song(MyJsonConvertable):
         return all_songs
 
     @classmethod
-    def get_page(cls, page_num:int = 1, per_page:int = 2) -> (list['Song'], API_Response_Handler.API_page_info):
+    def get_page(cls, page_num: int = 1, per_page: int = None) -> (list['Song'], API_Response_Handler.API_page_info):
         """Get paged songs from DB"""
 
-        all_user_songs: list[Song_User_Data] = Song_User_Data.get_page(page_num=page_num, per_page=per_page)
+        all_user_songs: list[Song_User_Data] = Song_User_Data.get_page(
+            page_num=page_num, per_page=per_page)
 
         all_songs: list[Song] = []
 
         for user_song_data in all_user_songs:
             all_songs.append(Song.get(id=user_song_data.id))
 
-        
         page_info = API_Response_Handler.create_page_info(all_user_songs)
 
         return (all_songs, page_info)
