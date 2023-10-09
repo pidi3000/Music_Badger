@@ -10,10 +10,11 @@ import flask
 import pyyoutube
 from pyyoutube import Client, AccessToken, PyYouTubeException
 
-from badger.error import BadgerYTUserNotAuthorized
+from badger.error import BadgerYTUserNotAuthorized, Badger_YT_API_key_not_found
 from badger.config import app_config
 
 # CACHING DATA, dict with 'client_id' and 'client_secret'
+# ! TODO remove this, makes no sense as different users would get the same token data
 _client_secret_data: dict = None
 
 
@@ -55,6 +56,19 @@ class YouTube_Auth_Handler:
         _client_secret_data["client_secret"] = data["web"]["client_secret"]
 
         return _client_secret_data
+
+    ####################################################################################################
+    # API key functions
+    ####################################################################################################
+
+    @classmethod
+    def get_API_key(cls, check_set: bool = True):
+        YT_API_KEY = app_config.badger.YT_API_KEY
+
+        if check_set and (YT_API_KEY is None or len(YT_API_KEY.strip()) < 10):
+            raise Badger_YT_API_key_not_found()
+
+        return app_config.badger.YT_API_KEY
 
     ##################################################
     # Credential functions
@@ -119,11 +133,12 @@ class YouTube_Auth_Handler:
         """
         Check if the users YT account has authorized the service
         """
-        authorized = cls.SESSION_NAME_ACCESSTOKEN in flask.session and cls.check_secret_file_exists() and not cls.check_access_token_expired()
+        authorized = cls.SESSION_NAME_ACCESSTOKEN in flask.session and cls.check_secret_file_exists(
+        ) and not cls.check_access_token_expired()
         return authorized
 
     @classmethod
-    def get_authorized_client(cls) -> pyyoutube.Client:
+    def get_authorized_USER_client(cls) -> pyyoutube.Client:
         cls.assert_yt_authorized()
 
         access_token = cls.get_access_token()
@@ -134,6 +149,16 @@ class YouTube_Auth_Handler:
             refresh_token=access_token.refresh_token,
             client_id=client_secrets["client_id"],
             client_secret=client_secrets["client_secret"]
+        )
+
+        return client
+
+    @classmethod
+    def get_authorized_API_client(cls) -> pyyoutube.Client:
+        api_key = cls.get_API_key()
+
+        client = Client(
+            api_key=api_key
         )
 
         return client
