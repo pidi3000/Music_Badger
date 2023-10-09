@@ -14,7 +14,6 @@ from badger.error import BadgerYTUserNotAuthorized, Badger_YT_API_key_not_found
 from badger.config import app_config
 
 # CACHING DATA, dict with 'client_id' and 'client_secret'
-# ! TODO remove this, makes no sense as different users would get the same token data
 _client_secret_data: dict = None
 
 
@@ -89,16 +88,23 @@ class YouTube_Auth_Handler:
     @classmethod
     def delete_access_token(cls):
         # flask.session[cls.SESSION_NAME_ACCESSTOKEN] = None
-        flask.session.pop(cls.SESSION_NAME_ACCESSTOKEN)
+        try:
+            flask.session.pop(cls.SESSION_NAME_ACCESSTOKEN)
+        except KeyError:
+            pass
+        
         # del flask.session[cls.SESSION_NAME_ACCESSTOKEN]
 
     @classmethod
     def check_access_token_expired(cls):
-        access_token = cls.get_access_token()
-        expire_date = datetime.fromtimestamp(access_token.expires_at)
-        time_now = datetime.now()
+        if cls.check_yt_authorized():
+            access_token = cls.get_access_token()
+            expire_date = datetime.fromtimestamp(access_token.expires_at)
+            time_now = datetime.now()
 
-        return expire_date < time_now
+            return expire_date < time_now   
+        
+        return None
 
     ####################################################################################################
     # Authorization functions
@@ -184,7 +190,7 @@ class YouTube_Auth_Handler:
         # override redirect URI
         # client.DEFAULT_REDIRECT_URI = flask.url_for('.oauth2callback', _external=True)
         # default_redirect = "http://localhost:5000/api/v1/yt/oauth2callback"
-        default_redirect = "http://localhost:5000/yt/oauth2callback"
+        default_redirect = "http://localhost:5100/yt/oauth2callback"
         client.DEFAULT_REDIRECT_URI = default_redirect if redirect_uri is None else redirect_uri
 
         # Scope
