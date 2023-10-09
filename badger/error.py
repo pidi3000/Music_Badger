@@ -87,6 +87,10 @@ class BadgerYTUserNotAuthorized(BadgerBaseException):
 class BadgerEntryNotFound(BadgerBaseException):
     def __init__(self, message: str = "Requested resource could not be found", status_code=404) -> None:
         super().__init__(message, error_type="EntryNotFound", status_code=status_code)
+        
+class BadgerEntryAlreadyExists(BadgerBaseException):
+    def __init__(self, message: str = "Specified resource already exists", status_code=409) -> None:
+        super().__init__(message, error_type="EntryAlreadyExists", status_code=status_code)
 
 
 class BadgerUnsupportedMediaType(BadgerBaseException):

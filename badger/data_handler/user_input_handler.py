@@ -64,6 +64,7 @@ class User_Input_Handler:
 
     @classmethod
     def get_artists(cls, artist_data: int | str | Artist | list[str | Artist]) -> list[Artist]:
+        # TODO rework this, be stricter about the allowed input
         """
         Gets artist instances using a variety of user supplyed artist information
 
