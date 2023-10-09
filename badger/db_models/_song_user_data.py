@@ -4,10 +4,13 @@ if TYPE_CHECKING:
     from ._artist import Artist
     from ._song_meta_data import Song_Meta_Data
 
-from badger.extension import db
 from badger.db_models import _Base_Mixin
 from badger.db_models._artist_song import _artist_song
+
+from badger.config import app_config
+from badger.extension import db
 from badger.data_handler.youtube_data_handler import YouTube_Data_Handler
+
 
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql import func
@@ -155,7 +158,7 @@ class Song_User_Data(_Base_Mixin, db.Model):
         # return cls.query.filter_by(yt_id=yt_id).first()
 
     @classmethod
-    def get_page(cls, page_num: int = 1, per_page: int = 2) -> Pagination:
+    def get_page(cls, page_num: int = 1, per_page: int = None) -> Pagination:
         """Get page entrys from DB
 
         Parameters
@@ -163,7 +166,14 @@ class Song_User_Data(_Base_Mixin, db.Model):
         page_num
             the page number to get
 
+        per_page
+            Default: set in config using ENTRYS_PER_PAGE
+            Number of entrys per page.
+
         """
+
+        if per_page is None:
+            per_page = app_config.badger.ENTRYS_PER_PAGE
 
         return Song_User_Data.query.order_by(Song_User_Data.date_added.desc()).paginate(
             page=page_num,

@@ -278,7 +278,7 @@ class Song(MyJsonConvertable):
         return all_songs
 
     @classmethod
-    def get_page(cls, page_num: int = 1, per_page: int = 2) -> (list['Song'], API_Response_Handler.API_page_info):
+    def get_page(cls, page_num: int = 1, per_page: int = None) -> (list['Song'], API_Response_Handler.API_page_info):
         """Get paged songs from DB"""
 
         all_user_songs: list[Song_User_Data] = Song_User_Data.get_page(

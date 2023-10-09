@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy, model
 from badger.extension import db
 from badger.extension import MyJsonConvertable
 
+from badger.config import app_config
+
 
 class _Base_Mixin(MyJsonConvertable):
 
@@ -24,7 +26,7 @@ class _Base_Mixin(MyJsonConvertable):
         return cls.query.all()
 
     @classmethod
-    def get_page(cls, page_num: int = 1, per_page: int = 2) -> Pagination:
+    def get_page(cls, page_num: int = 1, per_page: int = None) -> Pagination:
         # 
         # docs fucntion parameters: https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
         # docs page properties: https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/api/#flask_sqlalchemy.pagination.Pagination
@@ -36,8 +38,16 @@ class _Base_Mixin(MyJsonConvertable):
         ----------
         page_num
             the page number to get
+        
+        per_page
+            Default: set in config using ENTRYS_PER_PAGE
+            Number of entrys per page.
 
         """
+        
+        if per_page is None:
+            per_page = app_config.badger.ENTRYS_PER_PAGE
+            
         print(page_num)
 
         return cls.query.paginate(
