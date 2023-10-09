@@ -2,8 +2,7 @@
 # Project exludes
 .vscode/
 *.db
-# music_feed/_data/private/client_secret_youtube.json
-# */_data/private/*
+data/
 client_secret_youtube.json
 temp/
 tests/

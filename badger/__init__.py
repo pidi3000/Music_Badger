@@ -9,6 +9,7 @@ from flask import Flask, render_template, Response, url_for, redirect, request
 from flask_session import Session
 from flask_migrate import Migrate
 
+
 def _register_all_blueprints(app: Flask):
 
     from badger import api as routes
@@ -86,10 +87,18 @@ def _init_db(app: Flask):
     # with app.app_context():
     #     db.create_all()
 
+
 def _init_session(app: Flask):
     Session(app)
     # sess = Session()
     # sess.init_app(app)
+
+
+def _init_config(app: Flask):
+    from badger.config import app_config
+    app_config.sync()
+
+    app.config.from_object(app_config.flask)
 
 
 def init_with_app(app: Flask):
@@ -101,7 +110,7 @@ def init_with_app(app: Flask):
     _register_base_routes(app)
 
 
-def create_app(config) -> Flask:
+def create_app() -> Flask:
     """
     Create app using settings defined in instace
 
@@ -113,7 +122,7 @@ def create_app(config) -> Flask:
     """
 
     app = Flask(__name__)
-    app.config.from_object(config)
+    _init_config(app)
 
     init_with_app(app)
 
