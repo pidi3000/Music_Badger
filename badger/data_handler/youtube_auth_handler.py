@@ -2,15 +2,16 @@
 
 import json
 import os
+from pathlib import Path
 from datetime import datetime
 
 import flask
-from flask import current_app
 
 import pyyoutube
 from pyyoutube import Client, AccessToken, PyYouTubeException
 
 from badger.error import BadgerYTUserNotAuthorized
+from badger.config import app_config
 
 # CACHING DATA, dict with 'client_id' and 'client_secret'
 _client_secret_data: dict = None
@@ -27,12 +28,12 @@ class YouTube_Auth_Handler:
     ####################################################################################################
 
     @classmethod
-    def get_client_secrets_file_path(cls) -> str:
-        return current_app.config["MUSIC_BADGER"]["CLIENT_SECRETS_FILE"]
+    def get_client_secrets_file_path(cls) -> Path:
+        return app_config.badger.CLIENT_SECRETS_FILE
 
     @classmethod
     def check_secret_file_exists(cls):
-        return os.path.isfile(cls.get_client_secrets_file_path())
+        return cls.get_client_secrets_file_path().exists()
 
     @classmethod
     def get_client_secret_data(cls):
