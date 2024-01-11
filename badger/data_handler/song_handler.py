@@ -1,5 +1,7 @@
 
 
+from badger.error import BadgerEntryNotFound
+
 from badger.db_models import Song_Meta_Data, Song_User_Data, Artist, Publisher
 from badger.extension import MyJsonConvertable
 
@@ -147,7 +149,7 @@ class Song(MyJsonConvertable):
         ValueError
             If the yt_id is invalid
 
-        LookupError
+        BadgerEntryNotFound
             If a Song with the yt_id does not exist\n
             If an Artist with the given id does not exist
 
@@ -165,7 +167,8 @@ class Song(MyJsonConvertable):
             raise ValueError(f"yt_ID invalid: '{yt_id}'")
 
         if not Song.check_exists(yt_id):
-            raise LookupError(f"Song with the yt_ID '{yt_id}' does not exist")
+            raise BadgerEntryNotFound(
+                f"Song with the yt_ID '{yt_id}' does not exist")
 
         artist_list = User_Input_Handler.get_artists(artist_data)
         print("DEBUG EDIT get:", artist_list)
@@ -210,7 +213,7 @@ class Song(MyJsonConvertable):
             If the id is invalid.
             If the yt_id is invalid.
 
-        LookupError
+        BadgerEntryNotFound
             If a Song with set prioritized ID does not exist
 
         """
@@ -225,10 +228,10 @@ class Song(MyJsonConvertable):
         # if not Song_User_Data.check_exists(id=id, yt_id=yt_id):
         if user_data is None:
             if id is not None:
-                raise LookupError(
+                raise BadgerEntryNotFound(
                     f"1- Song with the id '{id}' does not exists")
             if yt_id is not None:
-                raise LookupError(
+                raise BadgerEntryNotFound(
                     f"Song with the yt_ID '{yt_id}' does not exists")
 
             return Exception("uknown error occured")
