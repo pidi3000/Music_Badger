@@ -42,8 +42,6 @@ class Audio_File(db.Model):
     name = db.Column(db.String(200), nullable=False)
     extension = db.Column(db.String(200), nullable=False)
 
-    dl_status = db.Column(db.String(200), nullable=False, default="pending")
-
     audio_length = db.Column(db.Integer)
 
     @classmethod
@@ -59,8 +57,6 @@ class Image_File(db.Model):
     location = db.Column(db.String(200), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     extension = db.Column(db.String(200), nullable=False)
-
-    dl_status = db.Column(db.String(200), nullable=False, default="pending")
 
     @classmethod
     def create(cls, location, name, extension) -> Image_File:
