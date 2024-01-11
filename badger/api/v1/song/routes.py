@@ -15,7 +15,7 @@ from badger.data_handler.song_handler import Song
 
 @api_pages.route('/song', methods=["GET", "POST", "PUT"])
 @badger_Response
-def index():
+def song():
     response = None
     status_code = None
     page_info = None

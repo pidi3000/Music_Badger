@@ -94,6 +94,25 @@ class Badger_Config(Badger_Config_Section):
             self.CLIENT_SECRETS_FILE = self.CLIENT_SECRETS_FILE.relative_to(self.root_path)
 
 
+class Celery_Config(Badger_Config_Section):
+
+    broker_url: str
+    result_backend: Path
+    
+    task_ignore_result: bool
+
+    def setup(self):
+        self.broker_url = "redis://localhost"
+        self.result_backend = "redis://localhost"
+        
+        self.task_ignore_result = False
+
+    def post_process(self):
+        pass
+
+    def pre_process(self):
+        pass
+
 class Config(Badger_Config_Base):
     _exclude_vars_ = ["project_root", "data_dir", "config_file_path"]
 
@@ -103,10 +122,12 @@ class Config(Badger_Config_Base):
 
     flask: Flask_Config
     badger: Badger_Config
+    celery: Celery_Config
 
     def __init__(self) -> None:
         self.flask = Flask_Config(section_name="flask")
         self.badger = Badger_Config(section_name="badger")
+        self.celery = Celery_Config(section_name="celery")
 
         super().__init__(
             config_file_path=self.config_file_path,

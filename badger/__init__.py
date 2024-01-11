@@ -4,11 +4,14 @@ App factory init
 
 import os
 
+from celery import Celery
+
 import flask
 from flask import Flask, render_template, Response, url_for, redirect, request
 from flask_session import Session
 from flask_migrate import Migrate
 
+badger_app:Flask = None
 
 def _register_all_blueprints(app: Flask):
 
@@ -110,6 +113,29 @@ def init_with_app(app: Flask):
     _register_base_routes(app)
 
 
+def celery_init_app(app: Flask) -> Celery:
+    from badger.config import app_config
+
+    # class FlaskTask(Celery.Task):
+    #     def __call__(self, *args: object, **kwargs: object) -> object:
+    #         with app.app_context():
+    #             return self.run(*args, **kwargs)
+
+    # celery_app = Celery(app.name, task_cls=FlaskTask)
+    celery_app = Celery(app.name)
+    # celery_app.Task = FlaskTask
+    celery_app.config_from_object(dict(
+        broker_url="redis://localhost",
+        result_backend="redis://localhost",
+        task_ignore_result=False,
+    )
+    )
+    # celery_app.config_from_object(app_config.celery)
+    celery_app.set_default()
+    app.extensions["celery"] = celery_app
+    return celery_app
+
+
 def create_app() -> Flask:
     """
     Create app using settings defined in instace
@@ -120,10 +146,17 @@ def create_app() -> Flask:
     config
         instace with FLASK settings as variabels
     """
+    
+    global badger_app
 
     app = Flask(__name__)
     _init_config(app)
+    
+    app.app_context().push()
 
     init_with_app(app)
+    celery_init_app(app)
+    
+    badger_app = app
 
     return app

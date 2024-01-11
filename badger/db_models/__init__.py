@@ -11,6 +11,9 @@ from badger.config import app_config
 
 class _Base_Mixin(MyJsonConvertable):
 
+    def __repr__(self):
+        return f'<{self.__class__} {self.id}>'
+    
     @classmethod
     def create(cls, **kw) -> _Base_Mixin:
         """Create new entry in DB of this type, no duplicate checks done"""

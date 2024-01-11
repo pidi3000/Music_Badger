@@ -65,6 +65,7 @@ class Song_User_Data(_Base_Mixin, db.Model):
             yt_id=Song_Meta_Data.get(id=meta_data_id).yt_id)
 
         user_data: Song_User_Data = super().create(
+            id=meta_data_id,
             title=yt_data_handler.get_song_title(user_song_title),
             extras=yt_data_handler.get_song_extras(user_extras),
             meta_data_id=meta_data_id

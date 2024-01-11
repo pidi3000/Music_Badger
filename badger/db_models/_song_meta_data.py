@@ -54,7 +54,8 @@ class Song_Meta_Data(_Base_Mixin, db.Model):
     # Audio
     ################
     file_id_audio = db.Column(
-        db.Integer, db.ForeignKey('audio_file.id'), nullable=True, unique=True)
+        db.Integer, db.ForeignKey(Audio_File.id), nullable=True, unique=True)
+        # db.Integer, db.ForeignKey('audio_file.id'), nullable=True, unique=True)
 
     file_audio: Mapped[Audio_File] = db.relationship(
         "Audio_File", uselist=False, backref="meta_data")
@@ -63,7 +64,8 @@ class Song_Meta_Data(_Base_Mixin, db.Model):
     # Image
     ################
     file_id_image = db.Column(
-        db.Integer, db.ForeignKey('image_file.id'), nullable=True, unique=True)
+        db.Integer, db.ForeignKey(Image_File.id), nullable=True, unique=True)
+        # db.Integer, db.ForeignKey('image_file.id'), nullable=True, unique=True)
 
     file_image: Mapped[Image_File] = db.relationship(
         "Image_File", uselist=False, backref="meta_data")
